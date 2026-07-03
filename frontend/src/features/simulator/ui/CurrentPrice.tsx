@@ -9,8 +9,7 @@ export function CurrentPrice({
 }: CurrentPriceProps) {
   if (!quote) {
     return (
-      <div className="rounded border p-4 text-gray-500">
-        Enter a symbol and press Enter.
+      <div className="">
       </div>
     );
   }
@@ -21,7 +20,7 @@ export function CurrentPrice({
         {quote.symbol}
       </div> */}
 
-      <div className="mt-2 text-3xl">
+      <div className="mt-2 text-2xl">
         ${quote.price.toFixed(2)}
       </div>
 

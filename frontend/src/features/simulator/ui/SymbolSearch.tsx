@@ -46,7 +46,8 @@ export function SymbolSearch({
       />
 
       <button
-        onClick={onSubmit}
+        type="button"
+        onClick={() => onSubmit()}
         disabled={isLoading}
         className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
       >

@@ -19,6 +19,7 @@ export interface MarketData {
 
 export interface TradeSimulatorState {
     selectedSymbol: string;
+    recentSymbols: string[];
     marketData: MarketData;
     isLoading: boolean;
     error: string | null;

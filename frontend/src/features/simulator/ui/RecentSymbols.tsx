@@ -30,5 +30,4 @@ export function RecentSymbols({
 
     </div>
   );
-
 }

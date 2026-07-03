@@ -7,11 +7,13 @@ import { CurrentPrice } from "./CurrentPrice";
 import { MarketChart } from "../chart/MarketChart";
 
 import { getMarketData } from "../services/marketData";
+import { updateRecentSymbols } from "../utils/updateRecentSymbols";
 
 import type {
   MarketData,
   TradeSimulatorState,
 } from "../types";
+import { RecentSymbols } from "./RecentSymbols";
 
 const EMPTY_MARKET_DATA: MarketData = {
   quote: null,
@@ -21,16 +23,36 @@ const EMPTY_MARKET_DATA: MarketData = {
 export function TradeSimulator() {
   const [state, setState] = useState<TradeSimulatorState>({
     selectedSymbol: "",
+    recentSymbols: [],
     marketData: EMPTY_MARKET_DATA,
     isLoading: false,
     error: null,
   });
 
-  async function handleLookup() {
-    const symbol = state.selectedSymbol.trim();
+  async function handleLookup(
+
+    requestedSymbol?: string
+
+  ) {
+
+    const symbol = (
+
+      typeof requestedSymbol === "string"
+
+        ? requestedSymbol
+
+        : state.selectedSymbol
+
+    )
+
+      .trim()
+
+      .toUpperCase();
 
     if (!symbol) {
+
       return;
+
     }
 
     setState((current) => ({
@@ -42,6 +64,7 @@ export function TradeSimulator() {
     const marketData = await getMarketData(symbol);
 
     if (!marketData) {
+
       setState((current) => ({
         ...current,
         isLoading: false,
@@ -54,21 +77,29 @@ export function TradeSimulator() {
 
     setState((current) => ({
       ...current,
-      isLoading: false,
-      error: null,
+
+      selectedSymbol: symbol,
+
+      recentSymbols: updateRecentSymbols(
+        current.recentSymbols,
+        symbol
+      ),
+
       marketData,
+
+      isLoading: false,
+
+      error: null,
+
     }));
+
   }
 
   return (
     <Panel title="">
-
       <div className="flex h-full min-h-0 flex-col gap-4">
-
         <div className="flex items-center gap-4">
-
           <div className="flex items-center gap-4">
-
             <SymbolSearch
               value={state.selectedSymbol}
               isLoading={state.isLoading}
@@ -80,7 +111,6 @@ export function TradeSimulator() {
               }
               onSubmit={handleLookup}
             />
-
           </div>
 
           {!state.isLoading && (
@@ -88,7 +118,6 @@ export function TradeSimulator() {
               quote={state.marketData.quote}
             />
           )}
-
         </div>
 
         {state.error && (
@@ -103,18 +132,19 @@ export function TradeSimulator() {
           </div>
         )}
 
+        <RecentSymbols
+          symbols={state.recentSymbols}
+          onSelect={handleLookup}
+        />
+
         {!state.isLoading && (
           <div className="flex-1 min-h-0">
-
             <MarketChart
               marketData={state.marketData}
             />
-
           </div>
         )}
-
       </div>
-
     </Panel>
   );
 }
