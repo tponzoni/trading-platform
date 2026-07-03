@@ -9,6 +9,11 @@ import { MarketChart } from "../chart/MarketChart";
 import { getMarketData } from "../services/marketData";
 import { updateRecentSymbols } from "../utils/updateRecentSymbols";
 
+import {
+  loadRecentSymbols,
+  saveRecentSymbols,
+} from "../../../shared/services/storage/localStorageService";
+
 import type {
   MarketData,
   TradeSimulatorState,
@@ -23,7 +28,7 @@ const EMPTY_MARKET_DATA: MarketData = {
 export function TradeSimulator() {
   const [state, setState] = useState<TradeSimulatorState>({
     selectedSymbol: "",
-    recentSymbols: [],
+    recentSymbols: loadRecentSymbols(),
     marketData: EMPTY_MARKET_DATA,
     isLoading: false,
     error: null,
@@ -75,24 +80,29 @@ export function TradeSimulator() {
       return;
     }
 
-    setState((current) => ({
-      ...current,
+    setState((current) => {
 
-      selectedSymbol: symbol,
-
-      recentSymbols: updateRecentSymbols(
+      const recentSymbols = updateRecentSymbols(
         current.recentSymbols,
         symbol
-      ),
+      );
 
-      marketData,
+      saveRecentSymbols(recentSymbols);
 
-      isLoading: false,
+      return {
+        ...current,
 
-      error: null,
+        selectedSymbol: symbol,
 
-    }));
+        recentSymbols,
 
+        marketData,
+
+        isLoading: false,
+
+        error: null,
+      };
+    });
   }
 
   return (
