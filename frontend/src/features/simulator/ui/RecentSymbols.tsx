@@ -24,7 +24,6 @@ export function RecentSymbols({
           className="rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm hover:bg-gray-100"
         >
           {symbol}
-          test
         </button>
 
       ))}
