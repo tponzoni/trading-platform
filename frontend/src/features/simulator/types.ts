@@ -17,6 +17,11 @@ export interface MarketData {
     history: HistoricalPrice[];
 }
 
+export interface MarketDataRequest {
+    symbol: string;
+    timeframe: Timeframe;
+}
+
 export interface TradeSimulatorState {
     selectedSymbol: string;
     selectedTimeframe: Timeframe;

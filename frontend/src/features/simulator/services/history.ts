@@ -4,6 +4,7 @@ import type {
   HistoricalPrice,
   Timeframe,
 } from "../types";
+import { filterHistory } from "./filterHistory";
 
 export function getHistory(
   symbol: string,
@@ -17,5 +18,8 @@ export function getHistory(
     return [];
   }
 
-  return history;
+  return filterHistory(
+    history,
+    timeframe
+  );
 }

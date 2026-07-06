@@ -16,6 +16,7 @@ import {
 
 import type {
   MarketData,
+  Timeframe,
   TradeSimulatorState,
 } from "../types";
 import { RecentSymbols } from "./RecentSymbols";
@@ -32,7 +33,7 @@ export function TradeSimulator() {
 
     return {
       selectedSymbol: "",
-      selectedTimeframe: "1Y",
+      selectedTimeframe: workspace.selectedTimeframe,
       recentSymbols: workspace.recentSymbols,
       marketData: EMPTY_MARKET_DATA,
       isLoading: false,
@@ -51,7 +52,8 @@ export function TradeSimulator() {
   }, []);
 
   async function handleLookup(
-    requestedSymbol?: string
+    requestedSymbol?: string,
+    timeframe?: Timeframe
   ) {
     const symbol = (
       typeof requestedSymbol === "string"
@@ -69,7 +71,9 @@ export function TradeSimulator() {
       error: null,
     }));
 
-    const marketData = await getMarketData(symbol, state.selectedTimeframe);
+    const selectedTimeframe =
+      timeframe ?? state.selectedTimeframe;
+    const marketData = await getMarketData({ symbol, timeframe: selectedTimeframe });
 
     if (!marketData) {
       setState((current) => ({
@@ -101,6 +105,29 @@ export function TradeSimulator() {
         error: null,
       };
     });
+  }
+
+  async function handleTimeframeChanged(
+    selectedTimeframe: Timeframe
+  ) {
+
+    updateWorkspace({
+      selectedTimeframe,
+    });
+
+    setState((current) => ({
+      ...current,
+      selectedTimeframe,
+    }));
+
+    if (!state.marketData.quote) {
+      return;
+    }
+
+    await handleLookup(
+      state.marketData.quote.symbol,
+      selectedTimeframe
+    );
   }
 
   return (
@@ -147,12 +174,7 @@ export function TradeSimulator() {
 
         <TimeframeSelector
           selected={state.selectedTimeframe}
-          onSelect={(selectedTimeframe) =>
-            setState((current) => ({
-              ...current,
-              selectedTimeframe,
-            }))
-          }
+          onSelect={handleTimeframeChanged}
         />
 
         {!state.isLoading && (
