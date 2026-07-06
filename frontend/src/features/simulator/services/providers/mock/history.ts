@@ -2523,7 +2523,6 @@ export const MOCK_HISTORY: Record<string, HistoricalPrice[]> = {
     { time: "2026-07-03", open: 626.90, high: 635.73, low: 626.52, close: 632.84, volume: 43991059 },
     { time: "2026-07-06", open: 632.84, high: 639.30, low: 626.27, close: 628.73, volume: 57206223 },
   ],
-
   MSFT: [
     { time: "2016-11-08", open: 220.00, high: 221.40, low: 217.04, close: 218.71, volume: 32032422 },
     { time: "2016-11-09", open: 218.71, high: 221.20, low: 217.20, close: 219.05, volume: 27153475 },
@@ -5046,7 +5045,6 @@ export const MOCK_HISTORY: Record<string, HistoricalPrice[]> = {
     { time: "2026-07-03", open: 1442.51, high: 1448.48, low: 1437.39, close: 1441.02, volume: 24552407 },
     { time: "2026-07-06", open: 1441.02, high: 1442.74, low: 1428.20, close: 1434.44, volume: 21180583 },
   ],
-
   RKLB: [
     { time: "2016-11-08", open: 8.00, high: 8.14, low: 7.97, close: 8.12, volume: 11057795 },
     { time: "2016-11-09", open: 8.12, high: 8.15, low: 8.01, close: 8.04, volume: 14367598 },
@@ -7569,5 +7567,4 @@ export const MOCK_HISTORY: Record<string, HistoricalPrice[]> = {
     { time: "2026-07-03", open: 105.12, high: 106.08, low: 104.30, close: 105.07, volume: 16962429 },
     { time: "2026-07-06", open: 105.07, high: 105.60, low: 103.25, close: 103.64, volume: 14958125 },
   ],
-
 };

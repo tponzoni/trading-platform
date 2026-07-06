@@ -161,11 +161,11 @@ export function TradeSimulator() {
           </div>
         )}
 
-        {state.isLoading && (
+        {/* {state.isLoading && (
           <div className="rounded border border-blue-300 bg-blue-50 p-3 text-blue-700">
             Loading market data...
           </div>
-        )}
+        )} */}
 
         <RecentSymbols
           symbols={state.recentSymbols}

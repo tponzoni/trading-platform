@@ -38,21 +38,22 @@ export function SymbolSearch({
         value={value}
         placeholder="Stock symbol (e.g. AAPL)"
         disabled={isLoading}
-        className="w-28 rounded-md border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-16 rounded-sm border px-1 py-2 outline-none focus:ring-2 focus:ring-blue-500"
         onChange={(event) =>
           onChange(event.target.value.toUpperCase())
         }
         onKeyDown={handleKeyDown}
       />
 
-      <button
+      {/* <button
         type="button"
         onClick={() => onSubmit()}
         disabled={isLoading}
-        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50" 
+        
       >
         Search
-      </button>
+      </button> */}
 
     </div>
   );
