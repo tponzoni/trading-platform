@@ -1,4 +1,4 @@
-import type { HistoricalPrice } from "../types";
+import type { HistoricalPrice } from "../../../types";
 
 export const MOCK_HISTORY: Record<string, HistoricalPrice[]> = {
   AAPL: [

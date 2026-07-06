@@ -1,16 +1,23 @@
-import { MOCK_QUOTES } from "../mock/quotes";
-import { MOCK_HISTORY } from "../mock/history";
+import { MOCK_QUOTES } from "./providers/mock/quotes";
 
-import type { MarketData } from "../types";
+import {
+  type MarketData,
+  type Timeframe
+} from "../types";
+import { getHistory } from "./history";
 
 export async function getMarketData(
-  symbol: string
+  symbol: string,
+  timeframe: Timeframe
 ): Promise<MarketData | null> {
 
   const normalized = symbol.trim().toUpperCase();
 
   const quote = MOCK_QUOTES[normalized];
-  const history = MOCK_HISTORY[normalized];
+  const history = getHistory(
+    normalized,
+    timeframe
+  );
 
   // Simulate network latency
   await new Promise((resolve) => setTimeout(resolve, 300));

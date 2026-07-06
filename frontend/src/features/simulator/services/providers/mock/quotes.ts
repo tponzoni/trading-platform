@@ -1,4 +1,4 @@
-import type { StockQuote } from "../types";
+import type { StockQuote } from "../../../types";
 
 export const MOCK_QUOTES: Record<string, StockQuote> = {
 

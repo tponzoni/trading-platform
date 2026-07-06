@@ -19,8 +19,22 @@ export interface MarketData {
 
 export interface TradeSimulatorState {
     selectedSymbol: string;
+    selectedTimeframe: Timeframe;
     recentSymbols: string[];
     marketData: MarketData;
     isLoading: boolean;
     error: string | null;
 }
+
+export const TIMEFRAMES = [
+    "1D",
+    "5D",
+    "1M",
+    "3M",
+    "6M",
+    "1Y",
+    "5Y",
+    "MAX",
+] as const;
+
+export type Timeframe = (typeof TIMEFRAMES)[number];

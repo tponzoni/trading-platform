@@ -1,33 +1,54 @@
-const RECENT_SYMBOLS_KEY = "recentSymbols";
+import type { Workspace } from "./workspace";
 
-export function loadRecentSymbols(): string[] {
+const WORKSPACE_KEY = "workspace";
 
+const EMPTY_WORKSPACE: Workspace = {
+  recentSymbols: [],
+  selectedTimeframe: "6M",
+  layout: {
+    panelSizes: [50, 50],
+    leftSidebarWidth: 0,
+    rightSidebarWidth: 0,
+    portfolioHeight: 0
+  }
+};
+
+export function loadWorkspace(): Workspace {
   const value = localStorage.getItem(
-    RECENT_SYMBOLS_KEY
+    WORKSPACE_KEY
   );
 
   if (!value) {
-    return [];
+    return EMPTY_WORKSPACE;
   }
 
   try {
-    return JSON.parse(value);
-
+    return {
+      ...EMPTY_WORKSPACE,
+      ...JSON.parse(value),
+    };
   } catch {
-
-    return [];
-
+    return EMPTY_WORKSPACE;
   }
-
 }
 
-export function saveRecentSymbols(
-  symbols: string[]
+export function saveWorkspace(
+  workspace: Workspace
+): void {
+  localStorage.setItem(
+    WORKSPACE_KEY,
+    JSON.stringify(workspace)
+  );
+}
+
+export function updateWorkspace(
+  updates: Partial<Workspace>
 ): void {
 
-  localStorage.setItem(
-    RECENT_SYMBOLS_KEY,
-    JSON.stringify(symbols)
-  );
+  const workspace = loadWorkspace();
 
+  saveWorkspace({
+    ...workspace,
+    ...updates,
+  });
 }
