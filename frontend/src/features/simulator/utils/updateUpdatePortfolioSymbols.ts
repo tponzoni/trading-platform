@@ -1,4 +1,4 @@
-export function updateRecentSymbols(
+export function updateUpdatePortfolioSymbols(
   current: string[],
   symbol: string,
   maxItems = 10

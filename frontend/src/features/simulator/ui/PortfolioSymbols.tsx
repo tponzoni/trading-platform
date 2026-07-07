@@ -1,12 +1,12 @@
-type RecentSymbolsProps = {
+type PortfolioSymbolsProps = {
   symbols: string[];
   onSelect: (symbol: string) => void;
 };
 
-export function RecentSymbols({
+export function PortfolioSymbols({
   symbols,
   onSelect,
-}: RecentSymbolsProps) {
+}: PortfolioSymbolsProps) {
 
   if (symbols.length === 0) {
     return null;

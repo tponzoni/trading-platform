@@ -25,7 +25,6 @@ export interface MarketDataRequest {
 export interface TradeSimulatorState {
     selectedSymbol: string;
     selectedTimeframe: Timeframe;
-    recentSymbols: string[];
     marketData: MarketData;
     isLoading: boolean;
     error: string | null;

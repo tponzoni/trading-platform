@@ -7,19 +7,19 @@ import { CurrentPrice } from "./CurrentPrice";
 import { MarketChart } from "../chart/MarketChart";
 import { TimeframeSelector } from "../chart/TimeframeSelector";
 import { getMarketData } from "../services/marketData";
-import { updateRecentSymbols } from "../utils/updateRecentSymbols";
-
-import {
-  loadWorkspace,
-  updateWorkspace,
-} from "../../../shared/services/storage/localStorageService";
+// import { updateUpdatePortfolioSymbols } from "../utils/updateUpdatePortfolioSymbols";
 
 import type {
   MarketData,
   Timeframe,
   TradeSimulatorState,
 } from "../types";
-import { RecentSymbols } from "./RecentSymbols";
+// import { PortfolioSymbols } from "./PortfolioSymbols";
+
+import {
+  useWorkspace,
+} from "../../../app/providers/WorkspaceProvider";
+// import { loadWorkspace } from "../../../shared/services/storage/workspaceStorage";
 
 const EMPTY_MARKET_DATA: MarketData = {
   quote: null,
@@ -27,29 +27,35 @@ const EMPTY_MARKET_DATA: MarketData = {
 };
 
 export function TradeSimulator() {
+  // const {
+  //   workspace,
+  // } = useWorkspace();
+
+  // console.log(workspace);
+
   const [state, setState] = useState<TradeSimulatorState>(() => {
 
-    const workspace = loadWorkspace();
+    // const workspace = loadWorkspace();
 
     return {
       selectedSymbol: "",
-      selectedTimeframe: workspace.selectedTimeframe,
-      recentSymbols: workspace.recentSymbols,
+      selectedTimeframe: "1Y",
+      // PortfolioSymbols: workspace.PortfolioSymbols,
       marketData: EMPTY_MARKET_DATA,
       isLoading: false,
       error: null,
     }
   });
 
-  useEffect(() => {
-    const lastSymbol = state.recentSymbols[0];
+  // useEffect(() => {
+  //   const lastSymbol = state.PortfolioSymbols[0];
 
-    if (!lastSymbol) {
-      return;
-    }
+  //   if (!lastSymbol) {
+  //     return;
+  //   }
 
-    void handleLookup(lastSymbol);
-  }, []);
+  //   void handleLookup(lastSymbol);
+  // }, []);
 
   async function handleLookup(
     requestedSymbol?: string,
@@ -87,19 +93,19 @@ export function TradeSimulator() {
     }
 
     setState((current) => {
-      const recentSymbols = updateRecentSymbols(
-        current.recentSymbols,
-        symbol
-      );
+      // const PortfolioSymbols = updateUpdatePortfolioSymbols(
+      //   current.PortfolioSymbols,
+      //   symbol
+      // );
 
-      updateWorkspace({
-        recentSymbols,
-      });
+      // updateWorkspace({
+      //   PortfolioSymbols,
+      // });
 
       return {
         ...current,
         selectedSymbol: symbol,
-        recentSymbols,
+        // PortfolioSymbols,
         marketData,
         isLoading: false,
         error: null,
@@ -111,9 +117,9 @@ export function TradeSimulator() {
     selectedTimeframe: Timeframe
   ) {
 
-    updateWorkspace({
-      selectedTimeframe,
-    });
+    // updateWorkspace({
+    //   selectedTimeframe,
+    // });
 
     setState((current) => ({
       ...current,
@@ -167,10 +173,10 @@ export function TradeSimulator() {
           </div>
         )} */}
 
-        <RecentSymbols
-          symbols={state.recentSymbols}
+        {/* <PortfolioSymbols
+          symbols={state.PortfolioSymbols}
           onSelect={handleLookup}
-        />
+        /> */}
 
         <TimeframeSelector
           selected={state.selectedTimeframe}

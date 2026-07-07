@@ -1,7 +1,6 @@
 import type { Timeframe } from "../../../features/simulator/types";
 
-export interface Workspace {
-    recentSymbols: string[];
+export interface UserPreferences {
     selectedTimeframe: Timeframe;
     layout: {
         panelSizes: number[];
