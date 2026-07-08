@@ -1,8 +1,9 @@
-import { Panel } from "../../shared/components/Panel/Panel";
+import { Panel } from "../../../shared/components/Panel/Panel";
 
 import {
   useWorkspace,
-} from "../../app/providers/WorkspaceProvider";
+} from "../../../app/providers/WorkspaceProvider";
+import type { Portfolio } from "../types";
 
 export function PortfolioManager() {
 
@@ -102,10 +103,13 @@ export function PortfolioManager() {
 
     }
 
-    const portfolio = {
+    const portfolio: Portfolio = {
       id: crypto.randomUUID(),
       name: trimmedName,
       symbols: [],
+      deposits: [],
+      currency: "NZD",
+      selectedSymbol: ""
     };
 
     setWorkspace(current => ({

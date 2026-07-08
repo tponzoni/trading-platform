@@ -1,13 +1,16 @@
+export interface Deposit {
+  timestampUtc: string;
+  amount: number;
+  description: string;
+}
+
 export interface Portfolio {
-
-    id: string;
-
-    name: string;
-
-    selectedSymbol?: string;
-
-    symbols: string[];
-
+  id: string;
+  name: string;
+  currency: string;
+  selectedSymbol: string;
+  symbols: string[];
+  deposits: Deposit[];
 }
 
 export interface Trade {

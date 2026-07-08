@@ -2523,7 +2523,7 @@ export const MOCK_HISTORY: Record<string, HistoricalPrice[]> = {
     { time: "2026-07-03", open: 626.90, high: 635.73, low: 626.52, close: 632.84, volume: 43991059 },
     { time: "2026-07-06", open: 632.84, high: 639.30, low: 626.27, close: 628.73, volume: 57206223 },
   ],
-  MSFT: [
+  NVDA: [
     { time: "2016-11-08", open: 220.00, high: 221.40, low: 217.04, close: 218.71, volume: 32032422 },
     { time: "2016-11-09", open: 218.71, high: 221.20, low: 217.20, close: 219.05, volume: 27153475 },
     { time: "2016-11-10", open: 219.05, high: 221.25, low: 216.49, close: 217.68, volume: 26440595 },

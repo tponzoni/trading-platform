@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SplitView } from "./SplitView";
 
 import { TradeSimulator } from "../../features/simulator/ui/TradeSimulator";
-import { PortfolioManager } from "../../features/portfolio/PortfolioManager";
+import { PortfolioManager } from "../../features/portfolio/ui/PortfolioManager";
 
 import {
   loadUserPreferences,

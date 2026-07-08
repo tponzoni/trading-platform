@@ -5,8 +5,8 @@ export const MOCK_QUOTES: Record<string, StockQuote> = {
         symbol: "AAPL",
         price: 628.73,
     },
-    MSFT: {
-        symbol: "MSFT",
+    NVDA: {
+        symbol: "NVDA",
         price: 1434.44,
     },
     RKLB: {
