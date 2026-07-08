@@ -1,7 +1,13 @@
 export interface Portfolio {
-  id: string;
-  name: string;
-  symbols: string[];
+
+    id: string;
+
+    name: string;
+
+    selectedSymbol?: string;
+
+    symbols: string[];
+
 }
 
 export interface Trade {

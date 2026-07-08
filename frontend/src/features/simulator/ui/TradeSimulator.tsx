@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import { Panel } from "../../../shared/components/Panel/Panel";
 
@@ -20,12 +23,31 @@ import type {
   TradeSimulatorState,
 } from "../types";
 
+import {
+  useWorkspace,
+} from "../../../app/providers/WorkspaceProvider";
+
+import {
+  PortfolioSymbols,
+} from "./PortfolioSymbols";
+
 const EMPTY_MARKET_DATA: MarketData = {
   quote: null,
   history: [],
 };
 
 export function TradeSimulator() {
+
+  const {
+    workspace,
+    setWorkspace,
+  } = useWorkspace();
+
+  const portfolio =
+    workspace.portfolios.find(
+      (portfolio) =>
+        portfolio.id === workspace.portfolioId
+    );
 
   const [state, setState] = useState<TradeSimulatorState>(() => {
 
@@ -34,7 +56,7 @@ export function TradeSimulator() {
 
     return {
 
-      selectedSymbol: "",
+      searchText: "",
 
       timeframe: preferences.timeframe,
 
@@ -48,6 +70,20 @@ export function TradeSimulator() {
 
   });
 
+  useEffect(() => {
+
+  if (!portfolio?.selectedSymbol) {
+    return;
+  }
+
+  void handleLookup(
+    portfolio.selectedSymbol
+  );
+
+}, [
+  workspace.portfolioId,
+]);
+
   async function handleLookup(
     requestedSymbol?: string,
     timeframe?: Timeframe
@@ -56,7 +92,7 @@ export function TradeSimulator() {
     const symbol = (
       typeof requestedSymbol === "string"
         ? requestedSymbol
-        : state.selectedSymbol
+        : state.searchText ?? ""
     )
       .trim()
       .toUpperCase();
@@ -93,11 +129,38 @@ export function TradeSimulator() {
 
     }
 
+    setWorkspace(current => ({
+
+      ...current,
+
+      portfolios: current.portfolios.map(portfolio =>
+
+        portfolio.id === current.portfolioId
+
+          ? {
+            ...portfolio,
+
+            selectedSymbol: symbol,
+
+            symbols: portfolio.symbols.includes(symbol)
+              ? portfolio.symbols
+              : [
+                symbol,
+                ...portfolio.symbols,
+              ],
+          }
+
+          : portfolio
+
+      ),
+
+    }));
+
     setState((current) => ({
 
       ...current,
 
-      selectedSymbol: symbol,
+      searchText: symbol,
 
       marketData,
 
@@ -144,12 +207,12 @@ export function TradeSimulator() {
           <div className="flex items-center gap-4">
 
             <SymbolSearch
-              value={state.selectedSymbol}
+              value={state.searchText ?? ""}
               isLoading={state.isLoading}
-              onChange={(symbol) =>
+              onChange={(searchText) =>
                 setState((current) => ({
                   ...current,
-                  selectedSymbol: symbol,
+                  searchText,
                 }))
               }
               onSubmit={handleLookup}
@@ -176,6 +239,11 @@ export function TradeSimulator() {
           </div>
 
         )}
+
+        <PortfolioSymbols
+          portfolio={portfolio}
+          onSelect={handleLookup}
+        />
 
         <TimeframeSelector
           selected={state.timeframe}

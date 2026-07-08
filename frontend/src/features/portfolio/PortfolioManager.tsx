@@ -1,50 +1,47 @@
-import { useState } from "react";
-
 import { Panel } from "../../shared/components/Panel/Panel";
 
 import {
-  createPortfolio,
-  selectPortfolio,
-} from "./services/portfolioService";
-
-import {
-  loadWorkspace,
-} from "../../shared/services/storage/workspaceService";
+  useWorkspace,
+} from "../../app/providers/WorkspaceProvider";
 
 export function PortfolioManager() {
 
-  const [workspace, setWorkspace] =
-    useState(loadWorkspace);
-
-  function refreshWorkspace() {
-    setWorkspace(loadWorkspace());
-  }
+  const {
+    workspace,
+    setWorkspace,
+  } = useWorkspace();
 
   function handlePortfolioSelected(
     portfolioId: string
   ) {
 
-    selectPortfolio(portfolioId);
+    setWorkspace(current => ({
 
-    refreshWorkspace();
+      ...current,
+
+      portfolioId,
+
+    }));
 
   }
 
   function handleNewPortfolio() {
 
-    const name = window.prompt(
-      "Portfolio name"
-    );
+    const name =
+      window.prompt("Portfolio name");
 
     if (!name) {
       return;
     }
 
+    const trimmedName =
+      name.trim();
+
     if (
       workspace.portfolios.some(
-        (portfolio) =>
+        portfolio =>
           portfolio.name.toLowerCase() ===
-          name.toLowerCase()
+          trimmedName.toLowerCase()
       )
     ) {
 
@@ -56,11 +53,27 @@ export function PortfolioManager() {
 
     }
 
-    createPortfolio(
-      name.trim()
-    );
+    const portfolio = {
+      id: crypto.randomUUID(),
+      name: trimmedName,
+      symbols: [],
+    };
 
-    refreshWorkspace();
+    setWorkspace(current => ({
+
+      ...current,
+
+      portfolioId: portfolio.id,
+
+      portfolios: [
+
+        ...current.portfolios,
+
+        portfolio,
+
+      ],
+
+    }));
 
   }
 
@@ -72,7 +85,7 @@ export function PortfolioManager() {
 
         <div className="flex flex-wrap gap-2">
 
-          {workspace.portfolios.map((portfolio) => (
+          {workspace.portfolios.map(portfolio => (
 
             <button
 
@@ -85,18 +98,11 @@ export function PortfolioManager() {
               }
 
               className={
+                portfolio.id === workspace.portfolioId
 
-                portfolio.id ===
-                workspace.portfolioId
+                  ? "rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-white"
 
-                  ?
-
-                  "rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-white"
-
-                  :
-
-                  "rounded-md border border-gray-300 bg-gray-100 px-4 py-2 hover:bg-blue-100"
-
+                  : "rounded-md border border-gray-300 bg-gray-100 px-4 py-2 hover:bg-blue-100"
               }
 
             >
@@ -111,16 +117,7 @@ export function PortfolioManager() {
 
             onClick={handleNewPortfolio}
 
-            className="
-              rounded-md
-              border
-              border-blue-500
-              bg-blue-600
-              px-4
-              py-2
-              text-white
-              hover:bg-blue-700
-            "
+            className="rounded-md border border-blue-500 bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
 
           >
 

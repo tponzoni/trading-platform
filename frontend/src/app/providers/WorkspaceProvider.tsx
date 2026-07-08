@@ -1,19 +1,27 @@
 import {
     createContext,
     useContext,
+    useEffect,
     useState,
 } from "react";
 
 import type {
     Workspace,
 } from "../../features/workspace/types";
-import { loadWorkspace } from "../../shared/services/storage/workspaceService";
+
+import {
+    loadWorkspace,
+    saveWorkspace,
+} from "../../shared/services/storage/workspaceService";
 
 type WorkspaceContextValue = {
+
     workspace: Workspace;
+
     setWorkspace: React.Dispatch<
         React.SetStateAction<Workspace>
     >;
+
 };
 
 const WorkspaceContext =
@@ -22,7 +30,9 @@ const WorkspaceContext =
     >(undefined);
 
 type WorkspaceProviderProps = {
+
     children: React.ReactNode;
+
 };
 
 export function WorkspaceProvider({
@@ -30,18 +40,33 @@ export function WorkspaceProvider({
 }: WorkspaceProviderProps) {
 
     const [workspace, setWorkspace] =
-        useState(loadWorkspace);
+        useState<Workspace>(loadWorkspace);
+
+    //
+    // Persist automatically whenever
+    // the Workspace changes.
+    //
+    useEffect(() => {
+
+        saveWorkspace(workspace);
+
+    }, [workspace]);
 
     return (
+
         <WorkspaceContext.Provider
             value={{
                 workspace,
                 setWorkspace,
             }}
         >
+
             {children}
+
         </WorkspaceContext.Provider>
+
     );
+
 }
 
 export function useWorkspace() {
@@ -50,10 +75,13 @@ export function useWorkspace() {
         useContext(WorkspaceContext);
 
     if (!context) {
+
         throw new Error(
             "useWorkspace must be used inside WorkspaceProvider."
         );
+
     }
 
     return context;
+
 }

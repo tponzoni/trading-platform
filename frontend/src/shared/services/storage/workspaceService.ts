@@ -36,14 +36,14 @@ export function saveWorkspace(
 
 }
 
-export function updateWorkspace(
-  updates: Partial<Workspace>
-): void {
+// export function updateWorkspace(
+//   updates: Partial<Workspace>
+// ): void {
 
-  const workspace = loadWorkspace();
+//   const workspace = loadWorkspace();
 
-  saveWorkspace({
-    ...workspace,
-    ...updates,
-  });
-}
+//   saveWorkspace({
+//     ...workspace,
+//     ...updates,
+//   });
+// }

@@ -1,33 +1,57 @@
+import type { Portfolio } from "../../portfolio/types";
+
 type PortfolioSymbolsProps = {
-  symbols: string[];
-  onSelect: (symbol: string) => void;
+
+  portfolio: Portfolio | undefined;
+
+  onSelect: (
+    symbol: string
+  ) => void;
+
 };
 
 export function PortfolioSymbols({
-  symbols,
+  portfolio,
   onSelect,
 }: PortfolioSymbolsProps) {
 
-  if (symbols.length === 0) {
+  if (!portfolio) {
     return null;
   }
 
   return (
+
     <div className="flex flex-wrap gap-2">
 
-      {symbols.map((symbol) => (
+      {portfolio.symbols.map((symbol) => (
 
         <button
+
           key={symbol}
-          type="button"
-          onClick={() => onSelect(symbol)}
-          className="rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-sm hover:bg-gray-100"
+
+          onClick={() =>
+            onSelect(symbol)
+          }
+
+          className="
+            rounded
+            bg-gray-100
+            px-2
+            py-1
+            text-sm
+            hover:bg-blue-100
+          "
+
         >
+
           {symbol}
+
         </button>
 
       ))}
 
     </div>
+
   );
+
 }
