@@ -1,6 +1,6 @@
 import type { Portfolio } from "../portfolio/types";
 
 export interface Workspace {
-    selectedPortfolioId: string;
+    portfolioId: string;
     portfolios: Portfolio[];
 }

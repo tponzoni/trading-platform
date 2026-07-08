@@ -32,6 +32,7 @@ export function SymbolSearch({
     <div className="flex gap-2">
 
       <input
+        id="symbol"
         ref={inputRef}
         autoFocus
         type="text"

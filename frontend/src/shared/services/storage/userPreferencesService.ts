@@ -3,12 +3,12 @@ import type { UserPreferences } from "./userPreferences";
 const STORAGE_KEY = "userPreferences";
 
 const EMPTY_USER_PREFERENCES: UserPreferences = {
-  selectedTimeframe: "1Y",
+  timeframe: "1Y",
   layout: {
-    panelSizes: [50, 50],
-    leftSidebarWidth: 0,
-    rightSidebarWidth: 0,
-    portfolioHeight: 0
+    panelLayout: {
+      simulator: 50,
+      portfolio: 50
+    }
   },
 };
 
@@ -22,13 +22,39 @@ export function loadUserPreferences(): UserPreferences {
   }
 
   try {
-    return {
-      ...EMPTY_USER_PREFERENCES,
-      ...JSON.parse(value),
-    };
-  } catch {
-    return EMPTY_USER_PREFERENCES;
-  }
+
+  const stored =
+    JSON.parse(value) as Partial<UserPreferences>;
+
+  return {
+
+    ...EMPTY_USER_PREFERENCES,
+
+    ...stored,
+
+    layout: {
+
+      ...EMPTY_USER_PREFERENCES.layout,
+
+      ...stored.layout,
+
+      panelLayout: {
+
+        ...EMPTY_USER_PREFERENCES.layout.panelLayout,
+
+        ...stored.layout?.panelLayout,
+
+      },
+
+    },
+
+  };
+
+} catch {
+
+  return EMPTY_USER_PREFERENCES;
+
+}
 }
 
 export function saveUserPreferences(

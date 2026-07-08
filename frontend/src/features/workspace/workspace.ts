@@ -10,7 +10,7 @@ export function getSelectedPortfolio(
   const portfolio =
     workspace.portfolios.find(
       (portfolio) =>
-        portfolio.id === workspace.selectedPortfolioId
+        portfolio.id === workspace.portfolioId
     );
 
   if (!portfolio) {

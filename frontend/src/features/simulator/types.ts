@@ -24,7 +24,7 @@ export interface MarketDataRequest {
 
 export interface TradeSimulatorState {
     selectedSymbol: string;
-    selectedTimeframe: Timeframe;
+    timeframe: Timeframe;
     marketData: MarketData;
     isLoading: boolean;
     error: string | null;

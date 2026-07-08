@@ -38,11 +38,28 @@ export function createPortfolio(
     symbols: [],
   };
 
-  workspace.portfolios.push(portfolio);
+  workspace.portfolios = [
+    ...workspace.portfolios,
+    portfolio,
+  ];
 
-  workspace.selectedPortfolioId = portfolio.id;
+  workspace.portfolioId = portfolio.id;
 
   updateWorkspace(workspace);
 
   return portfolio;
+}
+
+export function selectPortfolio(
+  portfolioId: string
+): void {
+
+  const workspace =
+    loadWorkspace();
+
+  workspace.portfolioId =
+    portfolioId;
+
+  updateWorkspace(workspace);
+
 }

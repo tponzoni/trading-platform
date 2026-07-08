@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Panel } from "../../../shared/components/Panel/Panel";
 
@@ -6,20 +6,19 @@ import { SymbolSearch } from "./SymbolSearch";
 import { CurrentPrice } from "./CurrentPrice";
 import { MarketChart } from "../chart/MarketChart";
 import { TimeframeSelector } from "../chart/TimeframeSelector";
+
 import { getMarketData } from "../services/marketData";
-// import { updateUpdatePortfolioSymbols } from "../utils/updateUpdatePortfolioSymbols";
+
+import {
+  loadUserPreferences,
+  updateUserPreferences,
+} from "../../../shared/services/storage/userPreferencesService";
 
 import type {
   MarketData,
   Timeframe,
   TradeSimulatorState,
 } from "../types";
-// import { PortfolioSymbols } from "./PortfolioSymbols";
-
-import {
-  useWorkspace,
-} from "../../../app/providers/WorkspaceProvider";
-// import { loadWorkspace } from "../../../shared/services/storage/workspaceStorage";
 
 const EMPTY_MARKET_DATA: MarketData = {
   quote: null,
@@ -27,45 +26,40 @@ const EMPTY_MARKET_DATA: MarketData = {
 };
 
 export function TradeSimulator() {
-  // const {
-  //   workspace,
-  // } = useWorkspace();
-
-  // console.log(workspace);
 
   const [state, setState] = useState<TradeSimulatorState>(() => {
 
-    // const workspace = loadWorkspace();
+    const preferences =
+      loadUserPreferences();
 
     return {
+
       selectedSymbol: "",
-      selectedTimeframe: "1Y",
-      // PortfolioSymbols: workspace.PortfolioSymbols,
+
+      timeframe: preferences.timeframe,
+
       marketData: EMPTY_MARKET_DATA,
+
       isLoading: false,
+
       error: null,
-    }
+
+    };
+
   });
-
-  // useEffect(() => {
-  //   const lastSymbol = state.PortfolioSymbols[0];
-
-  //   if (!lastSymbol) {
-  //     return;
-  //   }
-
-  //   void handleLookup(lastSymbol);
-  // }, []);
 
   async function handleLookup(
     requestedSymbol?: string,
     timeframe?: Timeframe
   ) {
+
     const symbol = (
       typeof requestedSymbol === "string"
         ? requestedSymbol
         : state.selectedSymbol
-    ).trim().toUpperCase();
+    )
+      .trim()
+      .toUpperCase();
 
     if (!symbol) {
       return;
@@ -77,11 +71,17 @@ export function TradeSimulator() {
       error: null,
     }));
 
-    const selectedTimeframe =
-      timeframe ?? state.selectedTimeframe;
-    const marketData = await getMarketData({ symbol, timeframe: selectedTimeframe });
+    const tf =
+      timeframe ?? state.timeframe;
+
+    const marketData =
+      await getMarketData({
+        symbol,
+        timeframe: tf,
+      });
 
     if (!marketData) {
+
       setState((current) => ({
         ...current,
         isLoading: false,
@@ -90,40 +90,36 @@ export function TradeSimulator() {
       }));
 
       return;
+
     }
 
-    setState((current) => {
-      // const PortfolioSymbols = updateUpdatePortfolioSymbols(
-      //   current.PortfolioSymbols,
-      //   symbol
-      // );
+    setState((current) => ({
 
-      // updateWorkspace({
-      //   PortfolioSymbols,
-      // });
+      ...current,
 
-      return {
-        ...current,
-        selectedSymbol: symbol,
-        // PortfolioSymbols,
-        marketData,
-        isLoading: false,
-        error: null,
-      };
-    });
+      selectedSymbol: symbol,
+
+      marketData,
+
+      isLoading: false,
+
+      error: null,
+
+    }));
+
   }
 
   async function handleTimeframeChanged(
-    selectedTimeframe: Timeframe
+    timeframe: Timeframe
   ) {
 
-    // updateWorkspace({
-    //   selectedTimeframe,
-    // });
+    updateUserPreferences({
+      timeframe,
+    });
 
     setState((current) => ({
       ...current,
-      selectedTimeframe,
+      timeframe,
     }));
 
     if (!state.marketData.quote) {
@@ -132,15 +128,21 @@ export function TradeSimulator() {
 
     await handleLookup(
       state.marketData.quote.symbol,
-      selectedTimeframe
+      timeframe
     );
+
   }
 
   return (
+
     <Panel title="">
+
       <div className="flex h-full min-h-0 flex-col gap-4">
+
         <div className="flex items-center gap-4">
+
           <div className="flex items-center gap-4">
+
             <SymbolSearch
               value={state.selectedSymbol}
               isLoading={state.isLoading}
@@ -152,45 +154,50 @@ export function TradeSimulator() {
               }
               onSubmit={handleLookup}
             />
+
           </div>
 
           {!state.isLoading && (
+
             <CurrentPrice
               quote={state.marketData.quote}
             />
+
           )}
+
         </div>
 
         {state.error && (
+
           <div className="rounded border border-red-300 bg-red-50 p-3 text-red-700">
+
             {state.error}
+
           </div>
+
         )}
 
-        {/* {state.isLoading && (
-          <div className="rounded border border-blue-300 bg-blue-50 p-3 text-blue-700">
-            Loading market data...
-          </div>
-        )} */}
-
-        {/* <PortfolioSymbols
-          symbols={state.PortfolioSymbols}
-          onSelect={handleLookup}
-        /> */}
-
         <TimeframeSelector
-          selected={state.selectedTimeframe}
+          selected={state.timeframe}
           onSelect={handleTimeframeChanged}
         />
 
         {!state.isLoading && (
+
           <div className="flex-1 min-h-0">
+
             <MarketChart
               marketData={state.marketData}
             />
+
           </div>
+
         )}
+
       </div>
+
     </Panel>
+
   );
+
 }

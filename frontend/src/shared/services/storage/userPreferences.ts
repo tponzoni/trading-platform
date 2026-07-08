@@ -1,11 +1,13 @@
 import type { Timeframe } from "../../../features/simulator/types";
 
+export interface WorkspacePanelLayout {
+    simulator: number;
+    portfolio: number;
+}
+
 export interface UserPreferences {
-    selectedTimeframe: Timeframe;
+    timeframe: Timeframe;
     layout: {
-        panelSizes: number[];
-        leftSidebarWidth: number;
-        rightSidebarWidth: number;
-        portfolioHeight: number;
+        panelLayout: WorkspacePanelLayout;
     }
 }
