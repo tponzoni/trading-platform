@@ -1,57 +1,103 @@
-import { getPortfolioCash } from "../services/portfolioService";
-import type { Portfolio } from "../types";
+import type {
+    Portfolio,
+} from "../types";
+
+import {
+    getPortfolioCash,
+} from "../calculations/cash";
+
+import {
+    getMaximumTradeRisk,
+} from "../calculations/risk";
 
 type PortfolioOverviewProps = {
 
-  portfolio: Portfolio | undefined;
+    portfolio: Portfolio | undefined;
 
 };
 
 export function PortfolioOverview({
-  portfolio,
+    portfolio,
 }: PortfolioOverviewProps) {
 
-  if (!portfolio) {
-    return null;
-  }
+    if (!portfolio) {
+        return null;
+    }
 
-  const cash =
-    getPortfolioCash(portfolio);
+    const cash =
+        getPortfolioCash(
+            portfolio
+        );
 
-  return (
+    const maximumTradeRisk =
+        getMaximumTradeRisk(
+            portfolio
+        );
 
-    <div className="rounded-md border border-gray-200 p-4">
+    return (
 
-      <div className="flex justify-between">
+        <div className="rounded-md border border-gray-200 bg-white p-4">
 
-        <span className="font-medium">
+            {/* <h3 className="mb-4 text-sm font-semibold text-gray-700">
 
-          Cash
+                Portfolio Overview
 
-        </span>
+            </h3> */}
 
-        <span>
+            <div className="grid grid-cols-2 gap-y-2 text-sm">
 
-          {portfolio.currency}{" "}
+                <span>Currency</span>
 
-          {cash.toLocaleString(
-            undefined,
-            {
+                <span className="text-right font-medium">
 
-              minimumFractionDigits: 2,
+                    {portfolio.currency}
 
-              maximumFractionDigits: 2,
+                </span>
 
-            }
+                {/* <span>Cash</span>
 
-          )}
+                <span className="text-right font-medium">
 
-        </span>
+                    {cash.toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }
+                    )}
 
-      </div>
+                </span> */}
 
-    </div>
+                <span>
 
-  );
+                    Risk ({portfolio.riskPercent}%)
+
+                </span>
+
+                <span className="text-right font-medium">
+
+                    {maximumTradeRisk.toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }
+                    )}
+
+                </span>
+
+                {/* <span>Deposits</span>
+
+                <span className="text-right font-medium">
+
+                    {portfolio.deposits.length}
+
+                </span> */}
+
+            </div>
+
+        </div>
+
+    );
 
 }

@@ -5,6 +5,10 @@ import {
 } from "../../../app/providers/WorkspaceProvider";
 import type { Portfolio } from "../types";
 
+import {
+  PortfolioOverview,
+} from "./PortfolioOverview";
+
 export function PortfolioManager() {
 
   const {
@@ -109,7 +113,8 @@ export function PortfolioManager() {
       symbols: [],
       deposits: [],
       currency: "NZD",
-      selectedSymbol: ""
+      selectedSymbol: "",
+      riskPercent: 2
     };
 
     setWorkspace(current => ({
@@ -186,6 +191,15 @@ export function PortfolioManager() {
 
         </div>
 
+        <PortfolioOverview
+          portfolio={
+            workspace.portfolios.find(
+              portfolio =>
+                portfolio.id ===
+                workspace.portfolioId
+            )
+          }
+        />
       </div>
 
     </Panel>

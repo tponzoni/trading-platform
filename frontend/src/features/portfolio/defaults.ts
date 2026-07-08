@@ -4,10 +4,10 @@ export const DEFAULT_PORTFOLIOS = [
         name: "Tiger",
 
         currency: "NZD",
-
+        riskPercent: 2,
         selectedSymbol: "AAPL",
 
-        symbols: ["AAPL","NVDA","RKLB"],
+        symbols: ["AAPL", "NVDA", "RKLB"],
 
         deposits: [
 
