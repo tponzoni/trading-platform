@@ -72,17 +72,17 @@ export function TradeSimulator() {
 
   useEffect(() => {
 
-  if (!portfolio?.selectedSymbol) {
-    return;
-  }
+    if (!portfolio?.selectedSymbol) {
+      return;
+    }
 
-  void handleLookup(
-    portfolio.selectedSymbol
-  );
+    void handleLookup(
+      portfolio.selectedSymbol
+    );
 
-}, [
-  workspace.portfolioId,
-]);
+  }, [
+    workspace.portfolioId,
+  ]);
 
   async function handleLookup(
     requestedSymbol?: string,
@@ -172,6 +172,50 @@ export function TradeSimulator() {
 
   }
 
+  function handleSymbolDeleted(
+    symbol: string
+  ) {
+
+    setWorkspace(current => ({
+
+      ...current,
+
+      portfolios: current.portfolios.map(portfolio => {
+
+        if (
+          portfolio.id !== current.portfolioId
+        ) {
+          return portfolio;
+        }
+
+        const symbols =
+          portfolio.symbols.filter(
+            currentSymbol =>
+              currentSymbol !== symbol
+          );
+
+        return {
+
+          ...portfolio,
+
+          symbols,
+
+          selectedSymbol:
+
+            portfolio.selectedSymbol === symbol
+
+              ? symbols[0] ?? ""
+
+              : portfolio.selectedSymbol,
+
+        };
+
+      }),
+
+    }));
+
+  }
+
   async function handleTimeframeChanged(
     timeframe: Timeframe
   ) {
@@ -243,6 +287,7 @@ export function TradeSimulator() {
         <PortfolioSymbols
           portfolio={portfolio}
           onSelect={handleLookup}
+          onDelete={handleSymbolDeleted}
         />
 
         <TimeframeSelector

@@ -25,6 +25,55 @@ export function PortfolioManager() {
 
   }
 
+  function handlePortfolioDeleted(
+    portfolioId: string
+  ) {
+
+    const portfolio =
+      workspace.portfolios.find(
+        portfolio =>
+          portfolio.id === portfolioId
+      );
+
+    if (!portfolio) {
+      return;
+    }
+
+    //
+    // Never allow deleting the
+    // Default portfolio.
+    //
+    if (
+      portfolio.id === "11111111-1111-1111-1111-111111111111"
+    ) {
+      alert("You cannot remove the Random portfolio.");
+      return;
+    }
+
+    const portfolios =
+      workspace.portfolios.filter(
+        portfolio =>
+          portfolio.id !== portfolioId
+      );
+
+    const selectedPortfolio =
+      portfolios[
+      portfolios.length - 1
+      ];
+
+    setWorkspace(current => ({
+
+      ...current,
+
+      portfolios,
+
+      portfolioId:
+        selectedPortfolio.id,
+
+    }));
+
+  }
+
   function handleNewPortfolio() {
 
     const name =
@@ -93,6 +142,12 @@ export function PortfolioManager() {
 
               onClick={() =>
                 handlePortfolioSelected(
+                  portfolio.id
+                )
+              }
+
+              onDoubleClick={() =>
+                handlePortfolioDeleted(
                   portfolio.id
                 )
               }

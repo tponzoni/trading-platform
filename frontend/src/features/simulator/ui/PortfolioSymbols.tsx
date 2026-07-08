@@ -8,11 +8,18 @@ type PortfolioSymbolsProps = {
     symbol: string
   ) => void;
 
+  onDelete: (
+
+    symbol: string
+
+  ) => void;
+
 };
 
 export function PortfolioSymbols({
   portfolio,
   onSelect,
+  onDelete,
 }: PortfolioSymbolsProps) {
 
   if (!portfolio) {
@@ -33,15 +40,22 @@ export function PortfolioSymbols({
             onSelect(symbol)
           }
 
-          className="
-            rounded
-            bg-gray-100
-            px-2
-            py-1
-            text-sm
-            hover:bg-blue-100
-          "
+          // onDoubleClick={() =>
+          //   onDelete(symbol)
+          // }
 
+          className={
+            portfolio.selectedSymbol === symbol
+              ? "rounded bg-blue-600 px-2 py-1 text-sm text-white"
+              : `
+                rounded
+                bg-gray-100
+                px-2
+                py-1
+                text-sm
+                hover:bg-blue-100
+              `
+          }
         >
 
           {symbol}
