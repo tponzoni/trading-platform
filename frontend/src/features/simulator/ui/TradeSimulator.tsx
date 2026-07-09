@@ -32,7 +32,7 @@ import {
 } from "./PortfolioSymbols";
 
 const EMPTY_MARKET_DATA: MarketData = {
-  quote: null,
+  quote: undefined,
   history: [],
 };
 
@@ -133,6 +133,8 @@ export function TradeSimulator() {
 
       ...current,
 
+      quote: marketData.quote,
+
       portfolios: current.portfolios.map(portfolio =>
 
         portfolio.id === current.portfolioId
@@ -179,7 +181,7 @@ export function TradeSimulator() {
     setWorkspace(current => ({
 
       ...current,
-
+      
       portfolios: current.portfolios.map(portfolio => {
 
         if (

@@ -24,7 +24,7 @@ export interface HistoricalPrice {
 
 export interface MarketData {
 
-    quote: StockQuote | null;
+    quote: StockQuote | undefined;
 
     history: HistoricalPrice[];
 

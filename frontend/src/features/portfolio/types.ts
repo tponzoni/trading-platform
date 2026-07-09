@@ -12,6 +12,7 @@ export interface Portfolio {
   symbols: string[];
   deposits: Deposit[];
   riskPercent: number;
+  stopLossPercent: number;
 }
 
 export interface Trade {

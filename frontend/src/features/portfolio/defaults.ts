@@ -1,13 +1,16 @@
+import { getStopLossPrice } from "./calculations/stopLoss";
+
 export const DEFAULT_PORTFOLIOS = [
     {
         id: "11111111-1111-1111-1111-111111111111",
-        name: "Tiger",
+        name: "All",
 
         currency: "NZD",
         riskPercent: 2,
+        stopLossPercent: 15,
         selectedSymbol: "AAPL",
 
-        symbols: ["AAPL", "NVDA", "RKLB"],
+        symbols: ["AAPL", "NVDA"],
 
         deposits: [
 
@@ -15,7 +18,7 @@ export const DEFAULT_PORTFOLIOS = [
 
                 timestampUtc: new Date().toISOString(),
 
-                amount: 29000,
+                amount: 42000,
 
                 description: "Initial capital",
 

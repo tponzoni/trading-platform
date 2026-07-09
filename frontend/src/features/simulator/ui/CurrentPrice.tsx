@@ -1,7 +1,7 @@
 import type { StockQuote } from "../types";
 
 type CurrentPriceProps = {
-  quote: StockQuote | null;
+  quote: StockQuote | undefined;
 };
 
 export function CurrentPrice({

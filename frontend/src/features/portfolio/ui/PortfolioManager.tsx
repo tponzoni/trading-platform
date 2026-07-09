@@ -114,7 +114,8 @@ export function PortfolioManager() {
       deposits: [],
       currency: "NZD",
       selectedSymbol: "",
-      riskPercent: 2
+      riskPercent: 2,
+      stopLossPercent: 15,
     };
 
     setWorkspace(current => ({
@@ -199,6 +200,7 @@ export function PortfolioManager() {
                 workspace.portfolioId
             )
           }
+          quote={workspace.quote}
         />
       </div>
 
