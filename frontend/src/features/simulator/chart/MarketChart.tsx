@@ -9,10 +9,12 @@ import {
 
 type MarketChartProps = {
   marketData: MarketData;
+  stopPrice?: number;
 };
 
 export function MarketChart({
   marketData,
+  stopPrice,
 }: MarketChartProps) {
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +52,18 @@ export function MarketChart({
     );
 
   }, [marketData.history]);
+
+  useEffect(() => {
+
+    if (!chartRef.current) {
+      return;
+    }
+console.log("Stop Price:", stopPrice);
+    chartRef.current.setStopPrice(
+      stopPrice
+    );
+
+  }, [stopPrice]);
 
   // // Resize the chart whenever its container changes size
   // useEffect(() => {

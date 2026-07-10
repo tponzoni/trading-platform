@@ -1,17 +1,32 @@
 import {
-  createChart,
-  type IChartApi,
-  type ISeriesApi,
-  type Time,
-  CandlestickSeries,
+    createChart,
+    type IChartApi,
+    type ISeriesApi,
+    type Time,
+    CandlestickSeries,
+    LineStyle,
 } from "lightweight-charts";
 
 import type { HistoricalPrice } from "../../types";
 
+// export interface LightweightChartAdapter {
+//     setCandles(history: HistoricalPrice[]): void;
+//     resize(width: number, height: number): void;
+//     destroy(): void;
+// }
+
 export interface LightweightChartAdapter {
+
     setCandles(history: HistoricalPrice[]): void;
+
+    setStopPrice(
+        stopPrice: number | undefined
+    ): void;
+
     resize(width: number, height: number): void;
+
     destroy(): void;
+
 }
 
 export function createLightweightChart(
@@ -49,6 +64,23 @@ export function createLightweightChart(
     const candleSeries: ISeriesApi<"Candlestick"> =
         chart.addSeries(CandlestickSeries);
 
+    let stopPriceLine =
+        candleSeries.createPriceLine({
+
+            price: 0,
+
+            color: "#ef4444",
+
+            lineWidth: 2,
+
+            lineStyle: LineStyle.Solid,
+
+            axisLabelVisible: false,
+
+            title: "STOP",
+
+        });
+
     return {
 
         setCandles(history) {
@@ -64,6 +96,60 @@ export function createLightweightChart(
             );
 
             chart.timeScale().fitContent();
+        },
+
+        setStopPrice(
+            stopPrice
+        ) {
+
+            if (stopPrice === undefined) {
+
+                candleSeries.removePriceLine(
+                    stopPriceLine
+                );
+
+                stopPriceLine =
+                    candleSeries.createPriceLine({
+
+                        price: 0,
+
+                        color: "#ef4444",
+
+                        lineWidth: 2,
+
+                        lineStyle: LineStyle.Solid,
+
+                        axisLabelVisible: false,
+
+                        title: "STOP",
+
+                    });
+
+                return;
+
+            }
+
+            candleSeries.removePriceLine(
+                stopPriceLine
+            );
+
+            stopPriceLine =
+                candleSeries.createPriceLine({
+
+                    price: stopPrice,
+
+                    color: "#ef4444",
+
+                    lineWidth: 2,
+
+                    lineStyle: LineStyle.Solid,
+
+                    axisLabelVisible: true,
+
+                    title: "STOP",
+
+                });
+
         },
 
         resize(width, height) {

@@ -30,6 +30,7 @@ import {
 import {
   PortfolioSymbols,
 } from "./PortfolioSymbols";
+import { getStopLossPrice } from "../../portfolio/calculations/stopLoss";
 
 const EMPTY_MARKET_DATA: MarketData = {
   quote: undefined,
@@ -69,6 +70,19 @@ export function TradeSimulator() {
     };
 
   });
+
+  const currentPrice =
+    state.marketData.quote?.price;
+
+  const stopPrice =
+    currentPrice === undefined
+
+      ? undefined
+
+      : getStopLossPrice(
+        currentPrice,
+        portfolio?.stopLossPercent ?? 15,
+      );
 
   useEffect(() => {
 
@@ -181,7 +195,7 @@ export function TradeSimulator() {
     setWorkspace(current => ({
 
       ...current,
-      
+
       portfolios: current.portfolios.map(portfolio => {
 
         if (
@@ -303,6 +317,7 @@ export function TradeSimulator() {
 
             <MarketChart
               marketData={state.marketData}
+              stopPrice={stopPrice}
             />
 
           </div>

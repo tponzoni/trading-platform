@@ -27,6 +27,10 @@ import {
 } from "../calculations/capitalRequired";
 import type { StockQuote } from "../../simulator/types";
 
+import {
+    getMaximumLoss,
+} from "../calculations/maximumLoss";
+
 type PortfolioOverviewProps = {
 
     portfolio: Portfolio | undefined;
@@ -92,11 +96,41 @@ export function PortfolioOverview({
                 quote.price!
             );
 
+    const maximumLoss =
+        maximumShares === undefined
+            || lossPerShare === undefined
+
+            ? undefined
+
+            : getMaximumLoss(
+                maximumShares,
+                lossPerShare,
+            );
+
     return (
 
         <div className="rounded-md border border-gray-200 bg-white p-4">
 
             <div className="grid grid-cols-2 gap-y-2 text-sm">
+
+                <span>
+
+                    Cash
+
+                </span>
+                
+
+                <span className="text-right font-medium">
+
+                    ${cash.toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }
+                    )}
+
+                </span>
 
                 <span>
 
@@ -106,13 +140,21 @@ export function PortfolioOverview({
 
                 <span className="text-right font-medium">
 
-                    {maximumRisk.toLocaleString(
+                    ${maximumRisk.toLocaleString(
                         undefined,
                         {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                         }
                     )}
+
+                </span>
+
+                <span>Current Price</span>
+
+                <span className="text-right">
+
+                    ${quote?.price?.toFixed(2) ?? "—"}
 
                 </span>
 
@@ -124,19 +166,11 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Current Price</span>
-
-                <span className="text-right">
-
-                    {quote?.price?.toFixed(2) ?? "—"}
-
-                </span>
-
                 <span>Stop Price</span>
 
                 <span className="text-right">
 
-                    {stopPrice?.toFixed(2) ?? "—"}
+                    ${stopPrice?.toFixed(2) ?? "—"}
 
                 </span>
 
@@ -144,11 +178,11 @@ export function PortfolioOverview({
 
                 <span className="text-right">
 
-                    {lossPerShare?.toFixed(2) ?? "—"}
+                    ${lossPerShare?.toFixed(2) ?? "—"}
 
                 </span>
 
-                <span>Position Size</span>
+                <span>Max Position (Qty)</span>
 
                 <span className="text-right">
 
@@ -156,14 +190,28 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Capital Required</span>
+                <span>Max Position Value</span>
 
                 <span className="text-right">
 
-                    {capitalRequired?.toLocaleString(undefined, {
+                    ${capitalRequired?.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     }) ?? "—"}
+
+                </span>
+
+                <span>Maximum Loss</span>
+
+                <span className="text-right">
+
+                    ${maximumLoss?.toLocaleString(
+                        undefined,
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }
+                    ) ?? "—"}
 
                 </span>
 

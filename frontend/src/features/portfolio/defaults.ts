@@ -6,7 +6,7 @@ export const DEFAULT_PORTFOLIOS = [
         name: "All",
 
         currency: "NZD",
-        riskPercent: 2,
+        riskPercent: 1,
         stopLossPercent: 15,
         selectedSymbol: "AAPL",
 
@@ -18,7 +18,7 @@ export const DEFAULT_PORTFOLIOS = [
 
                 timestampUtc: new Date().toISOString(),
 
-                amount: 42000,
+                amount: 1000000,
 
                 description: "Initial capital",
 
