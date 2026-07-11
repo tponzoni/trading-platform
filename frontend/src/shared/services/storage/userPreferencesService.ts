@@ -6,8 +6,8 @@ const EMPTY_USER_PREFERENCES: UserPreferences = {
   timeframe: "1Y",
   layout: {
     panelLayout: {
-      simulator: 80,
-      portfolio: 20
+      simulator: 66,
+      portfolio: 34
     }
   },
 };

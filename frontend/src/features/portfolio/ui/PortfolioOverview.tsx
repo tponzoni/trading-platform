@@ -30,6 +30,7 @@ import type { StockQuote } from "../../simulator/types";
 import {
     getMaximumLoss,
 } from "../calculations/maximumLoss";
+import { getBalancedPyramidingPlan } from "../calculations/pyramiding";
 
 type PortfolioOverviewProps = {
 
@@ -86,6 +87,19 @@ export function PortfolioOverview({
                 lossPerShare
             );
 
+    const pyramidingPlan =
+        quote?.price === undefined
+            ? undefined
+            : getBalancedPyramidingPlan(
+
+                maximumShares ?? 0,
+
+                quote?.price,
+
+                5,
+
+            );
+
     const capitalRequired =
         maximumShares === undefined || quote === undefined
 
@@ -118,7 +132,7 @@ export function PortfolioOverview({
                     Cash
 
                 </span>
-                
+
 
                 <span className="text-right font-medium">
 
@@ -174,15 +188,15 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Loss / Share</span>
+                {/* <span>Loss / Share</span>
 
                 <span className="text-right">
 
                     ${lossPerShare?.toFixed(2) ?? "—"}
 
-                </span>
+                </span> */}
 
-                <span>Max Position (Qty)</span>
+                <span>Maximum Qty</span>
 
                 <span className="text-right">
 
@@ -190,7 +204,7 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Max Position Value</span>
+                <span>Maximum Value</span>
 
                 <span className="text-right">
 
@@ -201,7 +215,7 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Maximum Loss</span>
+                <span>Max Loss</span>
 
                 <span className="text-right">
 
@@ -212,6 +226,92 @@ export function PortfolioOverview({
                             maximumFractionDigits: 2,
                         }
                     ) ?? "—"}
+
+                </span>
+
+            </div>
+
+            <h3 className="mt-6 mb-2 text-sm font-semibold">
+
+                Pyramiding
+
+            </h3>
+
+            {pyramidingPlan?.parcels.map(parcel => (
+
+                <div
+                    key={parcel.entry}
+                    className="grid grid-cols-2 gap-y-1 text-sm mb-3"
+                >
+
+                    <span>
+
+                        Entry {parcel.entry}
+
+                    </span>
+
+                    <span className="text-right">
+
+                        {parcel.shares} shares
+
+                    </span>
+
+                    <span>
+
+                        Trigger
+
+                    </span>
+
+                    <span className="text-right">
+
+                        {parcel.entry === 1
+
+                            ? "Today"
+
+                            : `+${(parcel.entry - 1) * 5}%`
+                        }
+
+                    </span>
+
+                    <span>
+
+                        Price
+
+                    </span>
+
+                    <span className="text-right">
+
+                        {parcel.price.toFixed(2)}
+
+                    </span>
+
+                    <span>
+
+                        Value
+
+                    </span>
+
+                    <span className="text-right">
+
+                        {parcel.value.toFixed(2)}
+
+                    </span>
+
+                </div>
+
+            ))}
+
+            <div className="border-t pt-2 grid grid-cols-2 text-sm font-semibold">
+
+                <span>
+
+                    Total Deployment
+
+                </span>
+
+                <span className="text-right">
+
+                    {pyramidingPlan?.totalValue.toFixed(2)}
 
                 </span>
 

@@ -77,7 +77,7 @@ export function createLightweightChart(
 
             axisLabelVisible: false,
 
-            title: "STOP",
+            // title: "STOP",
 
         });
 
@@ -121,7 +121,7 @@ export function createLightweightChart(
 
                         axisLabelVisible: false,
 
-                        title: "STOP",
+                        // title: "STOP",
 
                     });
 
@@ -146,7 +146,7 @@ export function createLightweightChart(
 
                     axisLabelVisible: true,
 
-                    title: "STOP",
+                    // title: "STOP",
 
                 });
 

@@ -8,6 +8,7 @@ import type { Portfolio } from "../types";
 import {
   PortfolioOverview,
 } from "./PortfolioOverview";
+import { DEFAULT_PORTFOLIOS } from "../defaults";
 
 export function PortfolioManager() {
 
@@ -172,7 +173,9 @@ export function PortfolioManager() {
 
             >
 
-              {portfolio.name}
+              {(portfolio.id === "11111111-1111-1111-1111-111111111111") 
+                ? DEFAULT_PORTFOLIOS[0].name 
+                : portfolio.name}
 
             </button>
 
