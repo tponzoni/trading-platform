@@ -36,3 +36,5 @@ dist-ssr
 # VS Code
 
 .vscode/settings.json
+
+*.zip

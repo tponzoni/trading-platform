@@ -24,6 +24,7 @@ export interface PyramidingStage {
     triggerPercent: number;
     entryPrice: number;
     stopPrice: number;
+    lossPerShare: number;
     risk: number;
     remainingRisk: number;
 }
@@ -70,6 +71,7 @@ function createStage(
         triggerPercent,
         entryPrice,
         stopPrice,
+        lossPerShare,
         risk,
         remainingRisk: availableRisk - risk,
     };

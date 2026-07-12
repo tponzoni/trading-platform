@@ -126,7 +126,7 @@ export function PortfolioOverview({
         <div className="rounded-md border border-gray-200 bg-white p-4">
 
             <div className="grid grid-cols-2 gap-y-2 text-sm">
-
+{/* 
                 <span>
 
                     Cash
@@ -136,7 +136,7 @@ export function PortfolioOverview({
 
                 <span className="text-right font-medium">
 
-                    ${cash.toLocaleString(
+                    $ {cash.toLocaleString(
                         undefined,
                         {
                             minimumFractionDigits: 2,
@@ -144,7 +144,7 @@ export function PortfolioOverview({
                         }
                     )}
 
-                </span>
+                </span> */}
 
                 <span>
 
@@ -154,7 +154,7 @@ export function PortfolioOverview({
 
                 <span className="text-right font-medium">
 
-                    ${maximumRisk.toLocaleString(
+                    $ {maximumRisk.toLocaleString(
                         undefined,
                         {
                             minimumFractionDigits: 2,
@@ -164,19 +164,19 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Current Price</span>
+                <span>Stock Price</span>
 
                 <span className="text-right">
 
-                    ${quote?.price?.toFixed(2) ?? "—"}
+                    $ {quote?.price?.toFixed(2) ?? "—"}
 
                 </span>
 
-                <span>Stop Loss %</span>
+                <span>Stop Loss</span>
 
                 <span className="text-right">
 
-                    {portfolio.stopLossPercent.toFixed(2)}%
+                    {portfolio.stopLossPercent.toFixed(0)}%
 
                 </span>
 
@@ -184,7 +184,7 @@ export function PortfolioOverview({
 
                 <span className="text-right">
 
-                    ${stopPrice?.toFixed(2) ?? "—"}
+                    $ {stopPrice?.toFixed(2) ?? "—"}
 
                 </span>
 
@@ -196,7 +196,7 @@ export function PortfolioOverview({
 
                 </span> */}
 
-                <span>Maximum Qty</span>
+                <span>Max Shares</span>
 
                 <span className="text-right">
 
@@ -204,11 +204,11 @@ export function PortfolioOverview({
 
                 </span>
 
-                <span>Maximum Value</span>
+                <span>Max Value</span>
 
                 <span className="text-right">
 
-                    ${capitalRequired?.toLocaleString(undefined, {
+                    $ {capitalRequired?.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     }) ?? "—"}
@@ -219,7 +219,7 @@ export function PortfolioOverview({
 
                 <span className="text-right">
 
-                    ${maximumLoss?.toLocaleString(
+                    $ {maximumLoss?.toLocaleString(
                         undefined,
                         {
                             minimumFractionDigits: 2,
@@ -231,69 +231,40 @@ export function PortfolioOverview({
 
             </div>
 
-            <h3 className="mt-6 mb-2 text-sm font-semibold">
+            <hr className="mt-3 pt-2" />
+
+            <h3 className="mb-2 text-sm font-semibold">
 
                 Pyramiding
 
             </h3>
-
             {pyramidingPlan?.parcels.map(parcel => (
 
                 <div
                     key={parcel.entry}
-                    className="grid grid-cols-2 gap-y-1 text-sm mb-3"
+                    className="pt-0 grid grid-cols-2 gap-y-1 text-sm mb-3"
                 >
 
-                    <span>
 
-                        Entry {parcel.entry}
 
-                    </span>
+
 
                     <span className="text-right">
 
-                        {parcel.shares} shares
+                        {parcel.shares} x $ {parcel.price.toFixed(2)}
 
                     </span>
 
-                    <span>
-
-                        Trigger
-
-                    </span>
 
                     <span className="text-right">
 
-                        {parcel.entry === 1
-
-                            ? "Today"
-
-                            : `+${(parcel.entry - 1) * 5}%`
-                        }
-
-                    </span>
-
-                    <span>
-
-                        Price
-
-                    </span>
-
-                    <span className="text-right">
-
-                        {parcel.price.toFixed(2)}
-
-                    </span>
-
-                    <span>
-
-                        Value
-
-                    </span>
-
-                    <span className="text-right">
-
-                        {parcel.value.toFixed(2)}
+                        $ {parcel.value?.toLocaleString(
+                            undefined,
+                            {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }
+                        ) ?? "—"}
 
                     </span>
 
@@ -305,13 +276,19 @@ export function PortfolioOverview({
 
                 <span>
 
-                    Total Deployment
+                    Deployment
 
                 </span>
 
                 <span className="text-right">
 
-                    {pyramidingPlan?.totalValue.toFixed(2)}
+                    $ {pyramidingPlan?.totalValue?.toLocaleString(
+                            undefined,
+                            {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }
+                        ) ?? "—"}
 
                 </span>
 
