@@ -58,7 +58,6 @@ export function MarketChart({
     if (!chartRef.current) {
       return;
     }
-console.log("Stop Price:", stopPrice);
     chartRef.current.setStopPrice(
       stopPrice
     );

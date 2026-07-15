@@ -1,3 +1,5 @@
+import type { TradeNote } from "../research/types";
+
 export interface Deposit {
   timestampUtc: string;
   amount: number;
@@ -11,6 +13,7 @@ export interface Portfolio {
   selectedSymbol: string;
   symbols: string[];
   deposits: Deposit[];
+  tradeNotes: TradeNote[];
   riskPercent: number;
   stopLossPercent: number;
 }
