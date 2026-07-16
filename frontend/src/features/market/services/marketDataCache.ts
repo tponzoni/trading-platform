@@ -13,7 +13,7 @@ interface StoredMarketData {
     quote?: StockQuote;
     history: CachedHistoricalPrice[];
     quoteCachedAt?: string;
-    historyCachedAt?: string;
+    historyCheckedThrough?: string;
 }
 
 type StoredMarketCache = Record<
@@ -21,18 +21,23 @@ type StoredMarketCache = Record<
     StoredMarketData
 >;
 
-const STORAGE_KEY = "marketCache";
+const STORAGE_KEY =
+    "marketCache";
 
 function loadMarketCache(): StoredMarketCache {
     const value =
-        localStorage.getItem(STORAGE_KEY);
+        localStorage.getItem(
+            STORAGE_KEY
+        );
 
     if (!value) {
         return {};
     }
 
     try {
-        return JSON.parse(value) as StoredMarketCache;
+        return JSON.parse(
+            value
+        ) as StoredMarketCache;
     } catch {
         return {};
     }
@@ -54,21 +59,26 @@ export function getCachedMarketData(
         symbol.trim().toUpperCase();
 
     const storedMarketData =
-        loadMarketCache()[normalizedSymbol];
+        loadMarketCache()[
+            normalizedSymbol
+        ];
 
     if (!storedMarketData) {
         return undefined;
     }
 
     return {
-        quote: storedMarketData.quote,
-        history: fromCachedHistory(
-            storedMarketData.history,
-        ),
+        quote:
+            storedMarketData.quote,
+        history:
+            fromCachedHistory(
+                storedMarketData.history ??
+                []
+            ),
         quoteCachedAt:
             storedMarketData.quoteCachedAt,
-        historyCachedAt:
-            storedMarketData.historyCachedAt,
+        historyCheckedThrough:
+            storedMarketData.historyCheckedThrough,
     };
 }
 
@@ -76,20 +86,23 @@ export function saveMarketData(
     symbol: string,
     marketData: CachedMarketData,
 ): void {
-    const cache = loadMarketCache();
+    const cache =
+        loadMarketCache();
 
     const normalizedSymbol =
         symbol.trim().toUpperCase();
 
     cache[normalizedSymbol] = {
-        quote: marketData.quote,
-        history: toCachedHistory(
-            marketData.history,
-        ),
+        quote:
+            marketData.quote,
+        history:
+            toCachedHistory(
+                marketData.history
+            ),
         quoteCachedAt:
             marketData.quoteCachedAt,
-        historyCachedAt:
-            marketData.historyCachedAt,
+        historyCheckedThrough:
+            marketData.historyCheckedThrough,
     };
 
     saveMarketCache(cache);
@@ -98,16 +111,21 @@ export function saveMarketData(
 export function removeCachedMarketData(
     symbol: string,
 ): void {
-    const cache = loadMarketCache();
+    const cache =
+        loadMarketCache();
 
     const normalizedSymbol =
         symbol.trim().toUpperCase();
 
-    delete cache[normalizedSymbol];
+    delete cache[
+        normalizedSymbol
+    ];
 
     saveMarketCache(cache);
 }
 
 export function clearMarketCache(): void {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
 }

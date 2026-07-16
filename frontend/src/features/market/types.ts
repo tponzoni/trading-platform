@@ -1,5 +1,5 @@
 export interface StockQuote {
-    // symbol: string;
+    symbol?: string;
     price: number;
 }
 
@@ -25,10 +25,19 @@ export interface CachedMarketData {
     quote?: StockQuote;
     history: HistoricalPrice[];
     quoteCachedAt?: string;
-    historyCachedAt?: string;
+    historyCheckedThrough?: string;
 }
 
-export type MarketCache = Record<
+export interface MarketRecord {
+    quote?: StockQuote;
+    history: HistoricalPrice[];
+}
+
+export interface MarketSeedRecord {
+    history: CachedHistoricalPrice[];
+}
+
+export type MarketSeed = Record<
     string,
-    CachedMarketData
+    MarketSeedRecord
 >;

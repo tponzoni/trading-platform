@@ -7,6 +7,10 @@ import { DEFAULT_PORTFOLIOS } from "../defaults";
 import { PortfolioOverview } from "./PortfolioOverview";
 import { ResearchNotes } from "../../research/ui/ResearchNotes";
 
+import {
+    exportMarketCache,
+} from "../../market/services/exportMarketCache";
+
 export function PortfolioManager() {
     const { workspace, setWorkspace } = useWorkspace();
 
@@ -110,7 +114,7 @@ export function PortfolioManager() {
                             }
                         >
                             {portfolio.id ===
-                            "11111111-1111-1111-1111-111111111111"
+                                "11111111-1111-1111-1111-111111111111"
                                 ? DEFAULT_PORTFOLIOS[0].name
                                 : portfolio.name}
                         </button>
@@ -121,6 +125,14 @@ export function PortfolioManager() {
                         className="rounded-md border border-blue-500 bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     >
                         +
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={exportMarketCache}
+                        className="rounded border px-3 py-1 text-sm"
+                    >
+                        Export Cache
                     </button>
                 </div>
 

@@ -27,7 +27,8 @@ interface EodhdHistoryItem {
     volume: number;
 }
 
-const PROVIDER = "eodhd";
+const PROVIDER =
+    "eodhd";
 
 function normalizeEodhdSymbol(
     symbol: string,
@@ -47,6 +48,8 @@ function normalizeEodhdSymbol(
 
 export async function fetchEodhdHistory(
     symbol: string,
+    fromDate: string,
+    toDate: string,
 ): Promise<HistoricalPrice[]> {
     const attemptedTokens =
         new Set<string>();
@@ -58,13 +61,16 @@ export async function fetchEodhdHistory(
         const availableTokens =
             EODHD_API_TOKENS.filter(
                 token =>
-                    !attemptedTokens.has(token)
+                    !attemptedTokens.has(
+                        token
+                    )
             );
 
-        const token = getNextApiKey(
-            PROVIDER,
-            availableTokens,
-        );
+        const token =
+            getNextApiKey(
+                PROVIDER,
+                availableTokens,
+            );
 
         if (!token) {
             return [];
@@ -73,21 +79,25 @@ export async function fetchEodhdHistory(
         attemptedTokens.add(token);
 
         const eodhdSymbol =
-            normalizeEodhdSymbol(symbol);
+            normalizeEodhdSymbol(
+                symbol
+            );
 
         const url =
             "/api/eodhd/api/eod/" +
             `${encodeURIComponent(eodhdSymbol)}` +
             `?api_token=${encodeURIComponent(token)}` +
             "&period=d" +
+            `&from=${encodeURIComponent(fromDate)}` +
+            `&to=${encodeURIComponent(toDate)}` +
             "&fmt=json" +
             "&order=a";
-
+console.log('here');
         try {
             const response =
-                await safeFetchJson<EodhdHistoryItem[]>(
-                    url
-                );
+                await safeFetchJson<
+                    EodhdHistoryItem[]
+                >(url);
 
             recordApiKeyUse(
                 PROVIDER,
@@ -98,7 +108,7 @@ export async function fetchEodhdHistory(
                 continue;
             }
 
-            const history = response
+            return response
                 .filter(item =>
                     typeof item.date === "string" &&
                     Number.isFinite(item.open) &&
@@ -115,10 +125,6 @@ export async function fetchEodhdHistory(
                     close: item.close,
                     volume: item.volume,
                 }));
-
-            if (history.length > 0) {
-                return history;
-            }
         } catch (error) {
             recordApiKeyUse(
                 PROVIDER,
@@ -127,7 +133,9 @@ export async function fetchEodhdHistory(
 
             if (
                 error instanceof ApiRequestError &&
-                [402, 403, 429].includes(error.status)
+                [402, 403, 429].includes(
+                    error.status
+                )
             ) {
                 temporarilyDisableApiKey(
                     PROVIDER,

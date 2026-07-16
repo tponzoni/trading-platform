@@ -16,11 +16,11 @@ function fromCachedDate(
 ): string {
     const value = date.toString();
 
-    return [
-        value.slice(0, 4),
-        value.slice(4, 6),
-        value.slice(6, 8),
-    ].join("-");
+    return (
+        `${value.slice(0, 4)}-` +
+        `${value.slice(4, 6)}-` +
+        value.slice(6, 8)
+    );
 }
 
 export function toCachedHistory(

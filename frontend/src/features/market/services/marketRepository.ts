@@ -1,5 +1,7 @@
 import type {
     CachedMarketData,
+    HistoricalPrice,
+    MarketRecord,
 } from "../types";
 
 import {
@@ -15,12 +17,25 @@ import {
     saveMarketData,
 } from "./marketDataCache";
 
+import {
+    getSeedHistory,
+} from "./marketSeed";
+
+import {
+    mergeHistory,
+} from "./historyMerge";
+
+import {
+    getDateDaysBefore,
+    getLatestClosedTradingDate,
+    getNextDate,
+} from "./historyDates";
+
 const QUOTE_CACHE_TTL = 1000 * 60;
-const HISTORY_CACHE_TTL = 1000 * 60 * 60 * 12;
 
 const pendingRequests = new Map<
     string,
-    Promise<CachedMarketData | undefined>
+    Promise<MarketRecord | undefined>
 >();
 
 function isFresh(
@@ -33,17 +48,90 @@ function isFresh(
 
     return (
         Date.now() -
-        new Date(cachedAt).getTime()
-        <
+        new Date(cachedAt).getTime() <
         ttlMilliseconds
     );
 }
 
-async function loadMarketData(
-    symbol: string,
-): Promise<CachedMarketData | undefined> {
-    const cached = getCachedMarketData(symbol);
+function getLastHistoryDate(
+    history: HistoricalPrice[],
+): string | undefined {
+    return history.at(-1)?.time;
+}
 
+async function loadMarketRecord(
+    symbol: string,
+): Promise<MarketRecord | undefined> {
+    //
+    // Load the permanent historical baseline.
+    //
+    const seedHistory =
+        getSeedHistory(symbol);
+
+    //
+    // Load only previously fetched candles.
+    //
+    const cached =
+        getCachedMarketData(symbol);
+
+    const cachedDelta =
+        cached?.history ?? [];
+
+    //
+    // Merge seed and local delta before
+    // determining the newest stored candle.
+    //
+    const existingHistory =
+        mergeHistory(
+            seedHistory,
+            cachedDelta,
+        );
+
+    const latestStoredDate =
+        getLastHistoryDate(
+            existingHistory,
+        );
+
+    const latestClosedTradingDate =
+        getLatestClosedTradingDate();
+
+    //
+    // Actual candle history is authoritative.
+    // Metadata must not make incomplete history
+    // appear current.
+    //
+    const historyIsCurrent =
+        latestStoredDate !== undefined &&
+        latestStoredDate >=
+        latestClosedTradingDate;
+
+    //
+    // If history exists, fetch from the day
+    // after its final candle.
+    //
+    // If no seed or delta exists, fetch a
+    // rolling year.
+    //
+    const fromDate =
+        historyIsCurrent
+            ? undefined
+            : latestStoredDate
+                ? getNextDate(
+                    latestStoredDate,
+                )
+                : getDateDaysBefore(
+                    latestClosedTradingDate,
+                    365,
+                );
+
+    const shouldFetchHistory =
+        fromDate !== undefined &&
+        fromDate <=
+        latestClosedTradingDate;
+
+    //
+    // Refresh quote independently.
+    //
     const quoteIsFresh =
         cached?.quote !== undefined &&
         isFresh(
@@ -51,74 +139,105 @@ async function loadMarketData(
             QUOTE_CACHE_TTL,
         );
 
-    const historyIsFresh =
-        cached !== undefined &&
-        cached.history.length > 0 &&
-        isFresh(
-            cached.historyCachedAt,
-            HISTORY_CACHE_TTL,
-        );
+    const quotePromise =
+        quoteIsFresh
+            ? Promise.resolve(
+                cached?.quote,
+            )
+            : fetchFinnhubQuote(
+                symbol,
+            );
 
-    if (
-        quoteIsFresh &&
-        historyIsFresh
-    ) {
-        return cached;
-    }
+    //
+    // Fetch only candles missing after the
+    // merged seed and cached delta.
+    //
+    const historyPromise =
+        fromDate !== undefined &&
+        shouldFetchHistory
+            ? fetchEodhdHistory(
+                symbol,
+                fromDate,
+                latestClosedTradingDate,
+            )
+            : Promise.resolve([]);
 
     const [
         quoteResult,
-        historyResult,
+        fetchedDelta,
     ] = await Promise.all([
-        quoteIsFresh
-            ? Promise.resolve(cached?.quote)
-            : fetchFinnhubQuote(symbol),
-
-        historyIsFresh
-            ? Promise.resolve(cached?.history ?? [])
-            : fetchEodhdHistory(symbol),
+        quotePromise,
+        historyPromise,
     ]);
 
     const quote =
         quoteResult ??
         cached?.quote;
 
-    const history =
-        historyResult.length > 0
-            ? historyResult
-            : cached?.history ?? [];
+    //
+    // Complete runtime history used by charts
+    // and timeframe filtering.
+    //
+    const completeHistory =
+        mergeHistory(
+            seedHistory,
+            cachedDelta,
+            fetchedDelta,
+        );
 
     if (
         !quote &&
-        history.length === 0
+        completeHistory.length === 0
     ) {
         return undefined;
     }
 
+    //
+    // Persist only fetched history.
+    // Seed history remains in seed.json.
+    //
+    const updatedDelta =
+        mergeHistory(
+            cachedDelta,
+            fetchedDelta,
+        );
+
     const now =
         new Date().toISOString();
 
-    const marketData: CachedMarketData = {
+    const cachedMarketData:
+        CachedMarketData = {
+            quote,
+            history:
+                updatedDelta,
+            quoteCachedAt:
+                quoteIsFresh
+                    ? cached?.quoteCachedAt
+                    : quoteResult
+                        ? now
+                        : cached?.quoteCachedAt,
+            historyCheckedThrough:
+                shouldFetchHistory
+                    ? latestClosedTradingDate
+                    : cached
+                        ?.historyCheckedThrough,
+        };
+
+    saveMarketData(
+        symbol,
+        cachedMarketData,
+    );
+
+    return {
         quote,
-        quoteCachedAt:
-            quoteResult !== undefined
-                ? now
-                : cached?.quoteCachedAt,
-        history,
-        historyCachedAt:
-            historyResult.length > 0
-                ? now
-                : cached?.historyCachedAt,
+        history:
+            completeHistory,
     };
-
-    saveMarketData(symbol, marketData);
-
-    return marketData;
 }
 
 export async function getMarketRecord(
     symbol: string,
-): Promise<CachedMarketData | undefined> {
+): Promise<MarketRecord | undefined> {
     const normalizedSymbol =
         symbol.trim().toUpperCase();
 
@@ -128,7 +247,7 @@ export async function getMarketRecord(
 
     const pendingRequest =
         pendingRequests.get(
-            normalizedSymbol
+            normalizedSymbol,
         );
 
     if (pendingRequest) {
@@ -136,18 +255,18 @@ export async function getMarketRecord(
     }
 
     const request =
-        loadMarketData(
-            normalizedSymbol
+        loadMarketRecord(
+            normalizedSymbol,
         )
             .finally(() => {
                 pendingRequests.delete(
-                    normalizedSymbol
+                    normalizedSymbol,
                 );
             });
 
     pendingRequests.set(
         normalizedSymbol,
-        request
+        request,
     );
 
     return request;

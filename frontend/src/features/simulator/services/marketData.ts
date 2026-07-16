@@ -15,7 +15,9 @@ export async function getMarketData(
     request: MarketDataRequest,
 ): Promise<MarketData | null> {
     const symbol =
-        request.symbol.trim().toUpperCase();
+        request.symbol
+            .trim()
+            .toUpperCase();
 
     if (!symbol) {
         return null;
@@ -23,22 +25,28 @@ export async function getMarketData(
 
     try {
         const marketRecord =
-            await getMarketRecord(symbol);
+            await getMarketRecord(
+                symbol
+            );
 
         if (!marketRecord?.quote) {
             return null;
         }
 
-        if (marketRecord.history.length === 0) {
+        if (
+            marketRecord.history.length === 0
+        ) {
             return null;
         }
 
         return {
-            quote: marketRecord.quote,
-            history: filterHistory(
-                marketRecord.history,
-                request.timeframe,
-            ),
+            quote:
+                marketRecord.quote,
+            history:
+                filterHistory(
+                    marketRecord.history,
+                    request.timeframe,
+                ),
         };
     } catch (error) {
         console.error(
