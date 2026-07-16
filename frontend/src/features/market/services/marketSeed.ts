@@ -1,4 +1,4 @@
-import seed from "../data/seed.json";
+import historicalPriceSeed from "../data/historical-price-seed.json";
 
 import type {
     HistoricalPrice,
@@ -10,7 +10,7 @@ import {
 } from "./historyMapper";
 
 const marketSeed =
-    seed as unknown as MarketSeed;
+    historicalPriceSeed as unknown as MarketSeed;
 
 export function getSeedHistory(
     symbol: string,
@@ -18,14 +18,14 @@ export function getSeedHistory(
     const normalizedSymbol =
         symbol.trim().toUpperCase();
 
-    const seedRecord =
+    const cachedHistory =
         marketSeed[normalizedSymbol];
 
-    if (!seedRecord?.history) {
+    if (!cachedHistory) {
         return [];
     }
 
     return fromCachedHistory(
-        seedRecord.history
+        cachedHistory,
     );
 }

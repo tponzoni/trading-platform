@@ -33,11 +33,7 @@ export interface MarketRecord {
     history: HistoricalPrice[];
 }
 
-export interface MarketSeedRecord {
-    history: CachedHistoricalPrice[];
-}
-
 export type MarketSeed = Record<
     string,
-    MarketSeedRecord
+    CachedHistoricalPrice[]
 >;

@@ -1,49 +1,116 @@
-const STORAGE_KEY = "marketCache";
+import type {
+    CachedHistoricalPrice,
+    MarketSeed,
+} from "../types";
 
-export function exportMarketCache(): void {
-    const value = localStorage.getItem(STORAGE_KEY);
+interface StoredMarketData {
+    history?: CachedHistoricalPrice[];
+}
+
+type StoredMarketCache = Record<
+    string,
+    StoredMarketData
+>;
+
+const STORAGE_KEY =
+    "marketCache";
+
+const EXPORT_FILE_NAME =
+    "historical-price-seed.json";
+
+function loadStoredMarketCache(): StoredMarketCache {
+    const value =
+        localStorage.getItem(
+            STORAGE_KEY,
+        );
 
     if (!value) {
-        throw new Error(
-            "No market cache was found in localStorage."
-        );
+        return {};
     }
-
-    let cache: unknown;
 
     try {
-        cache = JSON.parse(value);
+        return JSON.parse(
+            value,
+        ) as StoredMarketCache;
     } catch {
-        throw new Error(
-            "The market cache contains invalid JSON."
-        );
+        return {};
+    }
+}
+
+function createHistoricalPriceSeed(
+    cache: StoredMarketCache,
+): MarketSeed {
+    const seed: MarketSeed = {};
+
+    for (
+        const [
+            symbol,
+            marketData,
+        ] of Object.entries(cache)
+    ) {
+        const history =
+            marketData.history;
+
+        if (
+            !Array.isArray(history) ||
+            history.length === 0
+        ) {
+            continue;
+        }
+
+        seed[symbol] = history;
     }
 
-    const json = JSON.stringify(
-        cache,
-        null,
-        2,
-    );
+    return seed;
+}
 
-    const blob = new Blob(
-        [json],
-        {
-            type: "application/json",
-        },
-    );
+function downloadJson(
+    filename: string,
+    value: unknown,
+): void {
+    const json =
+        JSON.stringify(
+            value,
+            null,
+            4,
+        );
 
-    const url = URL.createObjectURL(blob);
+    const blob =
+        new Blob(
+            [json],
+            {
+                type: "application/json",
+            },
+        );
 
-    const link = document.createElement("a");
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
 
     link.href = url;
-    link.download = "marketSeed.json";
+    link.download = filename;
 
     document.body.appendChild(link);
 
     link.click();
-
     link.remove();
 
     URL.revokeObjectURL(url);
+}
+
+export function exportMarketCache(): void {
+    const cache =
+        loadStoredMarketCache();
+
+    const seed =
+        createHistoricalPriceSeed(
+            cache,
+        );
+
+    downloadJson(
+        EXPORT_FILE_NAME,
+        seed,
+    );
 }
