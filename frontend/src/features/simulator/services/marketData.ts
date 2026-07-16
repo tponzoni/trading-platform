@@ -1,33 +1,51 @@
-import { MOCK_QUOTES } from "./providers/mock/quotes";
+import type {
+    MarketData,
+    MarketDataRequest,
+} from "../types";
 
 import {
-  type MarketData,
-  type MarketDataRequest,
-  type Timeframe
-} from "../types";
-import { getHistory } from "./history";
+    getMarketRecord,
+} from "../../market/services/marketRepository";
+
+import {
+    filterHistory,
+} from "./filterHistory";
 
 export async function getMarketData(
-  request: MarketDataRequest
+    request: MarketDataRequest,
 ): Promise<MarketData | null> {
+    const symbol =
+        request.symbol.trim().toUpperCase();
 
-  const normalized = request.symbol.trim().toUpperCase();
+    if (!symbol) {
+        return null;
+    }
 
-  const quote = MOCK_QUOTES[normalized];
-  const history = getHistory(
-    normalized,
-    request.timeframe
-  );
+    try {
+        const marketRecord =
+            await getMarketRecord(symbol);
 
-  // Simulate network latency
-  await new Promise((resolve) => setTimeout(resolve, 300));
+        if (!marketRecord?.quote) {
+            return null;
+        }
 
-  if (!quote || !history) {
-    return null;
-  }
+        if (marketRecord.history.length === 0) {
+            return null;
+        }
 
-  return {
-    quote,
-    history,
-  };
+        return {
+            quote: marketRecord.quote,
+            history: filterHistory(
+                marketRecord.history,
+                request.timeframe,
+            ),
+        };
+    } catch (error) {
+        console.error(
+            `Unable to retrieve market data for ${symbol}.`,
+            error,
+        );
+
+        return null;
+    }
 }

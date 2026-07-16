@@ -1,5 +1,4 @@
 import type { Portfolio } from "../types";
-import type { StockQuote } from "../../simulator/types";
 
 import { getPortfolioCash } from "../calculations/cash";
 import { getMaximumTradeRisk } from "../calculations/risk";
@@ -9,6 +8,7 @@ import { getMaximumPositionShares } from "../calculations/positionSize";
 import { getCapitalRequired } from "../calculations/capitalRequired";
 import { getMaximumLoss } from "../calculations/maximumLoss";
 import { getBalancedPyramidingPlan } from "../calculations/pyramiding";
+import type { StockQuote } from "../../market/types";
 
 type PortfolioOverviewProps = {
     portfolio: Portfolio | undefined;
@@ -42,13 +42,15 @@ export function PortfolioOverview({
             ? undefined
             : getMaximumPositionShares(maximumRisk, lossPerShare);
 
+    const increasePercent = 5;
+
     const pyramidingPlan =
         quote?.price === undefined
             ? undefined
             : getBalancedPyramidingPlan(
                 maximumShares ?? 0,
                 quote.price,
-                5,
+                increasePercent,
             );
 
     const capitalRequired =
@@ -90,7 +92,7 @@ export function PortfolioOverview({
             <hr className="mt-3 pt-3" />
 
             <div className="grid grid-cols-2 gap-y-2 text-sm">
-                <span>{quote?.symbol} Price</span>
+                <span>{portfolio?.selectedSymbol} Price</span>
 
                 <span className="text-right">
                     $ {quote?.price?.toFixed(2) ?? "—"}
@@ -116,13 +118,21 @@ export function PortfolioOverview({
                 </span>
                 */}
 
+            </div>
+
+            <hr className="mt-3 pt-3" />
+
+            <h3 className="mb-2 text-sm font-semibold">Single Entry</h3>
+
+            <div className="grid grid-cols-2 gap-y-2 text-sm">
+
                 <span>Max Shares</span>
 
                 <span className="text-right">
                     {maximumShares?.toLocaleString() ?? "—"}
                 </span>
 
-                <span>Max Value</span>
+                <span>Initial Capital</span>
 
                 <span className="text-right">
                     ${" "}
@@ -145,15 +155,21 @@ export function PortfolioOverview({
 
             <hr className="mt-3 pt-2" />
 
-            <h3 className="mb-2 text-sm font-semibold">Pyramiding</h3>
+            {/* <h3 className="mb-2 text-sm font-semibold">Pyramiding {increasePercent}% ↑</h3> */}
+            <h3 className="mb-2 text-sm font-semibold">Capital Deployment</h3>
 
             {pyramidingPlan?.parcels.map((parcel) => (
                 <div
                     key={parcel.entry}
-                    className="mb-3 grid grid-cols-2 gap-y-1 pt-0 text-sm"
+                    className="mb-2 grid grid-cols-[40px_80px_1fr] gap-y-1 pt-0 text-sm"
                 >
+                    <span className="flex gap-5">
+                        <span>{parcel.shares}</span>
+                        <span>@</span>
+                    </span>
+
                     <span className="text-right">
-                        {parcel.shares} x $ {parcel.price.toFixed(2)}
+                        $ {parcel.price.toFixed(2)}
                     </span>
 
                     <span className="text-right">
@@ -167,7 +183,7 @@ export function PortfolioOverview({
             ))}
 
             <div className="grid grid-cols-2 border-t pt-2 text-sm font-semibold">
-                <span>Deployment</span>
+                <span>Total Deployment</span>
 
                 <span className="text-right">
                     ${" "}

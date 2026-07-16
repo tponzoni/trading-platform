@@ -32,6 +32,12 @@ export function PortfolioManager() {
             return;
         }
 
+        // Never allow deleting the last portfolio.
+        if (workspace?.portfolios?.length === 1) {
+            alert("You cannot remove the last portfolio.");
+            return;
+        }
+
         const portfolios = workspace.portfolios.filter(
             (portfolio) => portfolio.id !== portfolioId,
         );

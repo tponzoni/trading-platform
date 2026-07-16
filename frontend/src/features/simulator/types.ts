@@ -1,26 +1,5 @@
-export interface StockQuote {
+import type { StockQuote, HistoricalPrice } from "../market/types";
 
-    symbol: string;
-
-    price: number;
-
-}
-
-export interface HistoricalPrice {
-
-    time: string;
-
-    open: number;
-
-    high: number;
-
-    low: number;
-
-    close: number;
-
-    volume: number;
-
-}
 
 export interface MarketData {
 

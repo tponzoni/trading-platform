@@ -1,5 +1,3 @@
-import { getStopLossPrice } from "./calculations/stopLoss";
-
 export const DEFAULT_PORTFOLIOS = [    
     {
         id: "ebca93dd-4fac-45b6-a31e-68768f6c33c5",
@@ -7,7 +5,7 @@ export const DEFAULT_PORTFOLIOS = [
 
         currency: "NZD",
         riskPercent: 2,
-        stopLossPercent: 20,
+        stopLossPercent: 15,
         selectedSymbol: "AAPL",
 
         symbols: ["AAPL", "RKLB", "MA", "SPCX", "FSLR", "BKSY", "SATL", "FLY", "FANG", "MARA", "NVDA"],
@@ -26,29 +24,29 @@ export const DEFAULT_PORTFOLIOS = [
 
         ],
     },
-    {
-        id: "11111111-1111-1111-1111-111111111111",
-        name: "Paper",
+    // {
+    //     id: "11111111-1111-1111-1111-111111111111",
+    //     name: "Paper",
 
-        currency: "NZD",
-        riskPercent: 1,
-        stopLossPercent: 15,
-        selectedSymbol: "AAPL",
+    //     currency: "NZD",
+    //     riskPercent: 1,
+    //     stopLossPercent: 15,
+    //     selectedSymbol: "AAPL",
 
-        symbols: ["AAPL", "NVDA"],
-        tradeNotes: [],
-        deposits: [
+    //     symbols: ["AAPL", "NVDA"],
+    //     tradeNotes: [],
+    //     deposits: [
 
-            {
+    //         {
 
-                timestampUtc: new Date().toISOString(),
+    //             timestampUtc: new Date().toISOString(),
 
-                amount: 1000000,
+    //             amount: 1000000,
 
-                description: "Initial capital",
+    //             description: "Initial capital",
 
-            },
+    //         },
 
-        ],
-    },
+    //     ],
+    // },
 ];

@@ -7,4 +7,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    proxy: {
+      "/api/eodhd": {
+        target: "https://eodhd.com",
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/eodhd/, "")
+      }
+    }
+  }
 });

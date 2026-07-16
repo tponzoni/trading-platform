@@ -128,7 +128,7 @@ export function ResearchNotes() {
                     id="tradeNote"
                     value={tradeNote?.notes ?? ""}
                     placeholder="Capture the setup, entry rationale, stop-loss logic, pyramiding plan and exit conditions for this portfolio."
-                    rows={6}
+                    rows={5}
                     className="resize-y rounded-md border border-gray-300 p-2 text-xs outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={event =>
                         handleTradeNotesChanged(
