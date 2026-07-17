@@ -1,4 +1,6 @@
-import type { Portfolio } from "../../portfolio/types";
+import type {
+  Portfolio,
+} from "../../portfolio/types";
 
 type PortfolioSymbolsProps = {
 
@@ -9,9 +11,7 @@ type PortfolioSymbolsProps = {
   ) => void;
 
   onDelete: (
-
     symbol: string
-
   ) => void;
 
 };
@@ -26,11 +26,23 @@ export function PortfolioSymbols({
     return null;
   }
 
+  const symbols =
+    [...portfolio.symbols]
+      .sort((left, right) =>
+        left.localeCompare(
+          right,
+          undefined,
+          {
+            sensitivity: "base",
+          },
+        ),
+      );
+
   return (
 
     <div className="flex flex-wrap gap-2">
 
-      {portfolio.symbols.map((symbol) => (
+      {symbols.map((symbol) => (
 
         <button
 

@@ -31,7 +31,9 @@ import {
     getNextDate,
 } from "./historyDates";
 
-const QUOTE_CACHE_TTL = 1000 * 60;
+import {
+    QUOTE_CACHE_TTL,
+} from "./cachePolicy";
 
 const pendingRequests = new Map<
     string,
@@ -42,40 +44,64 @@ function isFresh(
     cachedAt: string | undefined,
     ttlMilliseconds: number,
 ): boolean {
+
     if (!cachedAt) {
+        return false;
+    }
+
+    const cachedTimestamp =
+        new Date(
+            cachedAt
+        ).getTime();
+
+    if (
+        Number.isNaN(
+            cachedTimestamp
+        )
+    ) {
         return false;
     }
 
     return (
         Date.now() -
-        new Date(cachedAt).getTime() <
+        cachedTimestamp <
         ttlMilliseconds
     );
+
 }
 
 function getLastHistoryDate(
     history: HistoricalPrice[],
 ): string | undefined {
+
     return history.at(-1)?.time;
+
 }
 
 async function loadMarketRecord(
     symbol: string,
 ): Promise<MarketRecord | undefined> {
+
     //
     // Load the permanent historical baseline.
     //
     const seedHistory =
-        getSeedHistory(symbol);
+        getSeedHistory(
+            symbol
+        );
 
     //
-    // Load only previously fetched candles.
+    // Load only previously fetched candles
+    // and the most recently cached quote.
     //
     const cached =
-        getCachedMarketData(symbol);
+        getCachedMarketData(
+            symbol
+        );
 
     const cachedDelta =
-        cached?.history ?? [];
+        cached?.history ??
+        [];
 
     //
     // Merge seed and local delta before
@@ -89,7 +115,7 @@ async function loadMarketRecord(
 
     const latestStoredDate =
         getLastHistoryDate(
-            existingHistory,
+            existingHistory
         );
 
     const latestClosedTradingDate =
@@ -117,7 +143,7 @@ async function loadMarketRecord(
             ? undefined
             : latestStoredDate
                 ? getNextDate(
-                    latestStoredDate,
+                    latestStoredDate
                 )
                 : getDateDaysBefore(
                     latestClosedTradingDate,
@@ -130,7 +156,13 @@ async function loadMarketRecord(
         latestClosedTradingDate;
 
     //
-    // Refresh quote independently.
+    // Quotes are cache-first.
+    //
+    // While the cached quote remains inside
+    // the configured TTL, Finnhub is not called.
+    //
+    // This keeps symbol switching and portfolio
+    // analysis fast during planning sessions.
     //
     const quoteIsFresh =
         cached?.quote !== undefined &&
@@ -142,10 +174,10 @@ async function loadMarketRecord(
     const quotePromise =
         quoteIsFresh
             ? Promise.resolve(
-                cached?.quote,
+                cached.quote
             )
             : fetchFinnhubQuote(
-                symbol,
+                symbol
             );
 
     //
@@ -153,8 +185,8 @@ async function loadMarketRecord(
     // merged seed and cached delta.
     //
     const historyPromise =
-        fromDate !== undefined &&
-        shouldFetchHistory
+        shouldFetchHistory &&
+        fromDate !== undefined
             ? fetchEodhdHistory(
                 symbol,
                 fromDate,
@@ -170,6 +202,10 @@ async function loadMarketRecord(
         historyPromise,
     ]);
 
+    //
+    // If the remote quote request fails,
+    // retain the last successfully cached quote.
+    //
     const quote =
         quoteResult ??
         cached?.quote;
@@ -194,7 +230,7 @@ async function loadMarketRecord(
 
     //
     // Persist only fetched history.
-    // Seed history remains in seed.json.
+    // Seed history remains bundled separately.
     //
     const updatedDelta =
         mergeHistory(
@@ -205,22 +241,29 @@ async function loadMarketRecord(
     const now =
         new Date().toISOString();
 
+    const quoteCachedAt =
+        quoteIsFresh
+            ? cached?.quoteCachedAt
+            : quoteResult
+                ? now
+                : cached?.quoteCachedAt;
+
     const cachedMarketData:
         CachedMarketData = {
+
             quote,
+
             history:
                 updatedDelta,
-            quoteCachedAt:
-                quoteIsFresh
-                    ? cached?.quoteCachedAt
-                    : quoteResult
-                        ? now
-                        : cached?.quoteCachedAt,
+
+            quoteCachedAt,
+
             historyCheckedThrough:
                 shouldFetchHistory
                     ? latestClosedTradingDate
                     : cached
                         ?.historyCheckedThrough,
+
         };
 
     saveMarketData(
@@ -229,25 +272,36 @@ async function loadMarketRecord(
     );
 
     return {
+
         quote,
+
         history:
             completeHistory,
+
     };
+
 }
 
 export async function getMarketRecord(
     symbol: string,
 ): Promise<MarketRecord | undefined> {
+
     const normalizedSymbol =
-        symbol.trim().toUpperCase();
+        symbol
+            .trim()
+            .toUpperCase();
 
     if (!normalizedSymbol) {
         return undefined;
     }
 
+    //
+    // Prevent simultaneous components from
+    // requesting the same symbol independently.
+    //
     const pendingRequest =
         pendingRequests.get(
-            normalizedSymbol,
+            normalizedSymbol
         );
 
     if (pendingRequest) {
@@ -256,12 +310,14 @@ export async function getMarketRecord(
 
     const request =
         loadMarketRecord(
-            normalizedSymbol,
+            normalizedSymbol
         )
             .finally(() => {
+
                 pendingRequests.delete(
-                    normalizedSymbol,
+                    normalizedSymbol
                 );
+
             });
 
     pendingRequests.set(
@@ -270,4 +326,5 @@ export async function getMarketRecord(
     );
 
     return request;
+
 }
