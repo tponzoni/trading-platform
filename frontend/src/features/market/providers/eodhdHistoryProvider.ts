@@ -16,6 +16,7 @@ import {
     ApiRequestError,
     safeFetchJson,
 } from "../services/safeFetch";
+import { playLoaded } from "../../../shared/sounds/soundService";
 
 interface EodhdHistoryItem {
     date: string;
@@ -107,6 +108,8 @@ console.log('here');
             if (!Array.isArray(response)) {
                 continue;
             }
+
+            playLoaded();
 
             return response
                 .filter(item =>

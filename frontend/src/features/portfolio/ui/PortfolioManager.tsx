@@ -132,7 +132,7 @@ export function PortfolioManager() {
                         onClick={exportMarketCache}
                         className="rounded border px-3 py-1 text-sm"
                     >
-                        Export Cache
+                        Cache
                     </button>
                 </div>
 

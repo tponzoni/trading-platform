@@ -1,3 +1,4 @@
+import { playClick } from "../../../shared/sounds/soundService";
 import type {
   Portfolio,
 } from "../../portfolio/types";
@@ -7,7 +8,7 @@ type PortfolioSymbolsProps = {
   portfolio: Portfolio | undefined;
 
   symbolsAt52WeekHigh:
-    ReadonlySet<string>;
+  ReadonlySet<string>;
 
   onSelect: (
     symbol: string
@@ -99,9 +100,10 @@ export function PortfolioSymbols({
                 : symbol
             }
 
-            onClick={() =>
+            onClick={() => {
+              playClick();
               onSelect(symbol)
-            }
+            }}
 
             // onDoubleClick={() =>
             //   onDelete(symbol)

@@ -1,4 +1,4 @@
-export const DEFAULT_PORTFOLIOS = [    
+export const DEFAULT_PORTFOLIOS = [
     {
         id: "ebca93dd-4fac-45b6-a31e-68768f6c33c5",
         name: "Portfolio",
@@ -8,7 +8,32 @@ export const DEFAULT_PORTFOLIOS = [
         stopLossPercent: 15,
         selectedSymbol: "AAPL",
 
-        symbols: ["AAPL", "RKLB", "MA", "SPCX", "FSLR", "BKSY", "SATL", "FLY", "FANG", "MARA", "NVDA"],
+        symbols: [
+            "RIVN",
+            "SOFI",
+            "JPM",
+            "OBK",
+            "EBC",
+            "SBUX",
+            "SNAP",
+            "CRM",
+            "ADBE",
+            "F",
+            "V",
+            "SPIR",
+            "MCD",
+            "AAPL",
+            "RKLB",
+            "MA",
+            "SPCX",
+            "FSLR",
+            "BKSY",
+            "SATL",
+            "FLY",
+            "FANG",
+            "MARA",
+            "NVDA"
+        ],
         tradeNotes: [],
         deposits: [
 
