@@ -1,36 +1,59 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
-import { Panel } from "../../../shared/components/Panel/Panel";
+import {
+  Panel,
+} from "../../../shared/components/Panel/Panel";
 
-import { SymbolSearch } from "./SymbolSearch";
-import { CurrentPrice } from "./CurrentPrice";
-import { MarketChart } from "../chart/MarketChart";
-import { TimeframeSelector } from "../chart/TimeframeSelector";
+import {
+  SymbolSearch,
+} from "./SymbolSearch";
 
-import { getMarketData } from "../services/marketData";
+import {
+  CurrentPrice,
+} from "./CurrentPrice";
+
+import {
+  MarketChart,
+} from "../chart/MarketChart";
+
+import {
+  TimeframeSelector,
+} from "../chart/TimeframeSelector";
+
+import {
+  PortfolioSymbols,
+} from "./PortfolioSymbols";
+
+import {
+  getMarketData,
+} from "../services/marketData";
+
+import {
+  get52WeekHighSymbols,
+} from "../../market/services/get52WeekHighSymbols";
+
+import {
+  getStopLossPrice,
+} from "../../portfolio/calculations/stopLoss";
 
 import {
   loadUserPreferences,
   updateUserPreferences,
 } from "../../../shared/services/storage/userPreferencesService";
 
+import {
+  useWorkspace,
+} from "../../../app/providers/WorkspaceProvider";
+
 import type {
   MarketData,
   Timeframe,
   TradeSimulatorState,
 } from "../types";
-
-import {
-  useWorkspace,
-} from "../../../app/providers/WorkspaceProvider";
-
-import {
-  PortfolioSymbols,
-} from "./PortfolioSymbols";
-import { getStopLossPrice } from "../../portfolio/calculations/stopLoss";
 
 const EMPTY_MARKET_DATA: MarketData = {
   quote: undefined,
@@ -46,11 +69,15 @@ export function TradeSimulator() {
 
   const portfolio =
     workspace.portfolios.find(
-      (portfolio) =>
-        portfolio.id === workspace.portfolioId
+      portfolio =>
+        portfolio.id ===
+        workspace.portfolioId
     );
 
-  const [state, setState] = useState<TradeSimulatorState>(() => {
+  const [
+    state,
+    setState,
+  ] = useState<TradeSimulatorState>(() => {
 
     const preferences =
       loadUserPreferences();
@@ -59,9 +86,11 @@ export function TradeSimulator() {
 
       searchText: "",
 
-      timeframe: preferences.timeframe,
+      timeframe:
+        preferences.timeframe,
 
-      marketData: EMPTY_MARKET_DATA,
+      marketData:
+        EMPTY_MARKET_DATA,
 
       isLoading: false,
 
@@ -71,8 +100,22 @@ export function TradeSimulator() {
 
   });
 
+  const symbolsAt52WeekHigh =
+    useMemo(
+      () =>
+        get52WeekHighSymbols(
+          portfolio?.symbols ?? []
+        ),
+      [
+        portfolio?.symbols,
+        state.marketData,
+      ]
+    );
+
   const currentPrice =
-    state.marketData.quote?.price;
+    state.marketData
+      .quote
+      ?.price;
 
   const stopPrice =
     currentPrice === undefined
@@ -81,12 +124,16 @@ export function TradeSimulator() {
 
       : getStopLossPrice(
         currentPrice,
-        portfolio?.stopLossPercent ?? 15,
+        portfolio
+          ?.stopLossPercent ??
+        15,
       );
 
   useEffect(() => {
 
-    if (!portfolio?.selectedSymbol) {
+    if (
+      !portfolio?.selectedSymbol
+    ) {
       return;
     }
 
@@ -101,11 +148,14 @@ export function TradeSimulator() {
   async function handleLookup(
     requestedSymbol?: string,
     timeframe?: Timeframe
-  ) {
+  ): Promise<void> {
 
     const symbol = (
-      typeof requestedSymbol === "string"
+      typeof requestedSymbol ===
+      "string"
+
         ? requestedSymbol
+
         : state.searchText ?? ""
     )
       .trim()
@@ -115,28 +165,44 @@ export function TradeSimulator() {
       return;
     }
 
-    setState((current) => ({
+    setState(current => ({
+
       ...current,
+
       isLoading: true,
+
       error: null,
+
     }));
 
-    const tf =
-      timeframe ?? state.timeframe;
+    const selectedTimeframe =
+      timeframe ??
+      state.timeframe;
 
     const marketData =
       await getMarketData({
+
         symbol,
-        timeframe: tf,
+
+        timeframe:
+          selectedTimeframe,
+
       });
 
     if (!marketData) {
 
-      setState((current) => ({
+      setState(current => ({
+
         ...current,
+
         isLoading: false,
-        error: "Unknown symbol.",
-        marketData: EMPTY_MARKET_DATA,
+
+        error:
+          "Unknown symbol.",
+
+        marketData:
+          EMPTY_MARKET_DATA,
+
       }));
 
       return;
@@ -147,36 +213,50 @@ export function TradeSimulator() {
 
       ...current,
 
-      quote: marketData.quote,
+      quote:
+        marketData.quote,
 
-      portfolios: current.portfolios.map(portfolio =>
+      portfolios:
+        current.portfolios.map(
+          portfolio =>
 
-        portfolio.id === current.portfolioId
+            portfolio.id ===
+            current.portfolioId
 
-          ? {
-            ...portfolio,
+              ? {
 
-            selectedSymbol: symbol,
+                ...portfolio,
 
-            symbols: portfolio.symbols.includes(symbol)
-              ? portfolio.symbols
-              : [
-                symbol,
-                ...portfolio.symbols,
-              ],
-          }
+                selectedSymbol:
+                  symbol,
 
-          : portfolio
+                symbols:
+                  portfolio.symbols
+                    .includes(
+                      symbol
+                    )
 
-      ),
+                    ? portfolio.symbols
+
+                    : [
+                      symbol,
+                      ...portfolio.symbols,
+                    ],
+
+              }
+
+              : portfolio
+
+        ),
 
     }));
 
-    setState((current) => ({
+    setState(current => ({
 
       ...current,
 
-      searchText: symbol,
+      searchText:
+        symbol,
 
       marketData,
 
@@ -190,43 +270,51 @@ export function TradeSimulator() {
 
   function handleSymbolDeleted(
     symbol: string
-  ) {
+  ): void {
 
     setWorkspace(current => ({
 
       ...current,
 
-      portfolios: current.portfolios.map(portfolio => {
+      portfolios:
+        current.portfolios.map(
+          portfolio => {
 
-        if (
-          portfolio.id !== current.portfolioId
-        ) {
-          return portfolio;
-        }
+            if (
+              portfolio.id !==
+              current.portfolioId
+            ) {
+              return portfolio;
+            }
 
-        const symbols =
-          portfolio.symbols.filter(
-            currentSymbol =>
-              currentSymbol !== symbol
-          );
+            const symbols =
+              portfolio.symbols.filter(
+                currentSymbol =>
+                  currentSymbol !==
+                  symbol
+              );
 
-        return {
+            return {
 
-          ...portfolio,
+              ...portfolio,
 
-          symbols,
+              symbols,
 
-          selectedSymbol:
+              selectedSymbol:
 
-            portfolio.selectedSymbol === symbol
+                portfolio
+                  .selectedSymbol ===
+                symbol
 
-              ? symbols[0] ?? ""
+                  ? symbols[0] ?? ""
 
-              : portfolio.selectedSymbol,
+                  : portfolio
+                    .selectedSymbol,
 
-        };
+            };
 
-      }),
+          }
+        ),
 
     }));
 
@@ -234,23 +322,30 @@ export function TradeSimulator() {
 
   async function handleTimeframeChanged(
     timeframe: Timeframe
-  ) {
+  ): Promise<void> {
 
     updateUserPreferences({
       timeframe,
     });
 
-    setState((current) => ({
+    setState(current => ({
+
       ...current,
+
       timeframe,
+
     }));
 
-    if (!state.marketData.quote) {
+    if (
+      !state.marketData.quote
+    ) {
       return;
     }
 
     await handleLookup(
-      state.marketData.quote.symbol,
+      state.marketData
+        .quote
+        .symbol,
       timeframe
     );
 
@@ -267,15 +362,25 @@ export function TradeSimulator() {
           <div className="flex items-center gap-4">
 
             <SymbolSearch
-              value={state.searchText ?? ""}
-              isLoading={state.isLoading}
-              onChange={(searchText) =>
-                setState((current) => ({
+              value={
+                state.searchText ??
+                ""
+              }
+              isLoading={
+                state.isLoading
+              }
+              onChange={searchText =>
+                setState(current => ({
+
                   ...current,
+
                   searchText,
+
                 }))
               }
-              onSubmit={handleLookup}
+              onSubmit={
+                handleLookup
+              }
             />
 
           </div>
@@ -283,7 +388,10 @@ export function TradeSimulator() {
           {!state.isLoading && (
 
             <CurrentPrice
-              quote={state.marketData.quote}
+              quote={
+                state.marketData
+                  .quote
+              }
             />
 
           )}
@@ -301,14 +409,27 @@ export function TradeSimulator() {
         )}
 
         <PortfolioSymbols
-          portfolio={portfolio}
-          onSelect={handleLookup}
-          onDelete={handleSymbolDeleted}
+          portfolio={
+            portfolio
+          }
+          symbolsAt52WeekHigh={
+            symbolsAt52WeekHigh
+          }
+          onSelect={
+            handleLookup
+          }
+          onDelete={
+            handleSymbolDeleted
+          }
         />
 
         <TimeframeSelector
-          selected={state.timeframe}
-          onSelect={handleTimeframeChanged}
+          selected={
+            state.timeframe
+          }
+          onSelect={
+            handleTimeframeChanged
+          }
         />
 
         {!state.isLoading && (
@@ -316,8 +437,12 @@ export function TradeSimulator() {
           <div className="flex-1 min-h-0">
 
             <MarketChart
-              marketData={state.marketData}
-              stopPrice={stopPrice}
+              marketData={
+                state.marketData
+              }
+              stopPrice={
+                stopPrice
+              }
             />
 
           </div>

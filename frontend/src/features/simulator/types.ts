@@ -59,7 +59,7 @@ export const TIMEFRAMES = [
 
     "1Y",
 
-    "5Y",
+    // "5Y",
 
     "MAX",
 
