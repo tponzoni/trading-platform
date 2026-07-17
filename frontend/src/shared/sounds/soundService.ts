@@ -8,7 +8,7 @@ clickSound.volume = 0.05;
 const loadedSound =
   new Audio("/sounds/loaded.wav");
 
-loadedSound.volume = 0.1;
+loadedSound.volume = 0.03;
 
 export function playClick(): void {
 

@@ -14,7 +14,7 @@ const TRADING_DAYS_PER_YEAR =
   252;
 
 const NEAR_52_WEEK_HIGH_PERCENT =
-  10;
+  5;
 
 function isNear52WeekHigh(
   symbol: string
