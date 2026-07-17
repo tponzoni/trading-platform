@@ -1,241 +1,436 @@
 import {
-    CandlestickSeries,
-    createChart,
-    HistogramSeries,
-    type IChartApi,
-    type ISeriesApi,
-    LineStyle,
-    type Time,
+  CandlestickSeries,
+  createChart,
+  HistogramSeries,
+  LineSeries,
+  LineStyle,
+  type IChartApi,
+  type ISeriesApi,
+  type Time,
 } from "lightweight-charts";
 import type { HistoricalPrice } from "../../../market/types";
 
+export type ChartType =
+  | "candles"
+  | "line";
+
 export interface LightweightChartAdapter {
 
-    setCandles(
-        history: HistoricalPrice[]
-    ): void;
+  setHistory(
+    history: HistoricalPrice[]
+  ): void;
 
-    setStopPrice(
-        stopPrice: number | undefined
-    ): void;
+  setChartType(
+    chartType: ChartType
+  ): void;
 
-    resize(
-        width: number,
-        height: number
-    ): void;
+  setStopPrice(
+    stopPrice: number | undefined
+  ): void;
 
-    destroy(): void;
+  resize(
+    width: number,
+    height: number
+  ): void;
+
+  destroy(): void;
 
 }
 
 export function createLightweightChart(
-    container: HTMLDivElement
+  container: HTMLDivElement
 ): LightweightChartAdapter {
 
-    const chart: IChartApi =
-        createChart(
-            container,
-            {
+  const chart: IChartApi =
+    createChart(
+      container,
+      {
 
-                autoSize: true,
+        autoSize: true,
 
-                layout: {
+        layout: {
 
-                    background: {
-                        color: "#ffffff",
-                    },
+          background: {
+            color: "#ffffff",
+          },
 
-                    textColor: "#374151",
+          textColor:
+            "#374151",
 
-                },
+        },
 
-                grid: {
+        grid: {
 
-                    vertLines: {
-                        color: "#f3f4f6",
-                    },
+          vertLines: {
+            color: "#f3f4f6",
+          },
 
-                    horzLines: {
-                        color: "#f3f4f6",
-                    },
+          horzLines: {
+            color: "#f3f4f6",
+          },
 
-                },
+        },
 
-                rightPriceScale: {
-                    borderColor: "#e5e7eb",
-                },
+        rightPriceScale: {
 
-                timeScale: {
-                    borderColor: "#e5e7eb",
-                },
+          borderColor:
+            "#e5e7eb",
 
-            }
-        );
+          scaleMargins: {
 
-    const candleSeries:
-        ISeriesApi<"Candlestick"> =
-        chart.addSeries(
-            CandlestickSeries
-        );
+            top: 0.08,
 
-    const volumeSeries:
-        ISeriesApi<"Histogram"> =
-        chart.addSeries(
-            HistogramSeries,
-            {
+            bottom: 0.25,
 
-                priceFormat: {
-                    type: "volume",
-                },
+          },
 
-                priceScaleId: "",
+        },
 
-            }
-        );
+        timeScale: {
 
-    volumeSeries
-        .priceScale()
-        .applyOptions({
+          borderColor:
+            "#e5e7eb",
 
-            scaleMargins: {
+          timeVisible: true,
 
-                top: 0.78,
+          secondsVisible: false,
 
-                bottom: 0,
+        },
 
-            },
+        crosshair: {
 
-        });
+          vertLine: {
+            labelVisible: true,
+          },
 
-    let stopPriceLine =
-        candleSeries.createPriceLine({
+          horzLine: {
+            labelVisible: true,
+          },
 
-            price: 0,
+        },
 
-            color: "#ef4444",
+      }
+    );
 
-            lineWidth: 2,
+  const candleSeries:
+    ISeriesApi<"Candlestick"> =
+    chart.addSeries(
+      CandlestickSeries,
+      {
 
-            lineStyle:
-                LineStyle.Solid,
+        upColor:
+          "#16a34a",
 
-            axisLabelVisible: false,
+        downColor:
+          "#dc2626",
 
-        });
+        borderVisible:
+          false,
 
-    function setCandles(
-        history: HistoricalPrice[]
-    ): void {
+        wickUpColor:
+          "#16a34a",
 
-        candleSeries.setData(
+        wickDownColor:
+          "#dc2626",
 
-            history.map(
-                (candle) => ({
+        visible:
+          true,
 
-                    time:
-                        candle.time as Time,
+      }
+    );
 
-                    open:
-                        candle.open,
+  const lineSeries:
+    ISeriesApi<"Line"> =
+    chart.addSeries(
+      LineSeries,
+      {
 
-                    high:
-                        candle.high,
+        color:
+          "#2563eb",
 
-                    low:
-                        candle.low,
+        lineWidth:
+          2,
 
-                    close:
-                        candle.close,
+        priceLineVisible:
+          true,
 
-                })
-            )
+        lastValueVisible:
+          true,
 
-        );
+        crosshairMarkerVisible:
+          true,
 
-        volumeSeries.setData(
+        crosshairMarkerRadius:
+          4,
 
-            history.map(
-                (candle) => ({
+        visible:
+          false,
 
-                    time:
-                        candle.time as Time,
+      }
+    );
 
-                    value:
-                        candle.volume,
+  const volumeSeries:
+    ISeriesApi<"Histogram"> =
+    chart.addSeries(
+      HistogramSeries,
+      {
 
-                    color:
-                        candle.close >=
-                        candle.open
-                            ? "rgba(22, 163, 74, 0.45)"
-                            : "rgba(220, 38, 38, 0.45)",
+        priceFormat: {
+          type: "volume",
+        },
 
-                })
-            )
+        priceScaleId: "",
 
-        );
+        lastValueVisible:
+          false,
 
-        chart
-            .timeScale()
-            .fitContent();
+        priceLineVisible:
+          false,
 
+      }
+    );
+
+  volumeSeries
+    .priceScale()
+    .applyOptions({
+
+      scaleMargins: {
+
+        top: 0.78,
+
+        bottom: 0,
+
+      },
+
+    });
+
+  const candleStopPriceLine =
+    candleSeries.createPriceLine({
+
+      price: 0,
+
+      color:
+        "#ef4444",
+
+      lineWidth: 2,
+
+      lineStyle:
+        LineStyle.Solid,
+
+      axisLabelVisible:
+        false,
+
+      title:
+        "Stop",
+
+    });
+
+  const lineStopPriceLine =
+    lineSeries.createPriceLine({
+
+      price: 0,
+
+      color:
+        "#ef4444",
+
+      lineWidth: 2,
+
+      lineStyle:
+        LineStyle.Solid,
+
+      axisLabelVisible:
+        false,
+
+      title:
+        "Stop",
+
+    });
+
+  let selectedChartType:
+    ChartType =
+    "candles";
+
+  function setHistory(
+    history: HistoricalPrice[]
+  ): void {
+
+    candleSeries.setData(
+
+      history.map(
+        candle => ({
+
+          time:
+            candle.time as Time,
+
+          open:
+            candle.open,
+
+          high:
+            candle.high,
+
+          low:
+            candle.low,
+
+          close:
+            candle.close,
+
+        })
+      )
+
+    );
+
+    lineSeries.setData(
+
+      history.map(
+        candle => ({
+
+          time:
+            candle.time as Time,
+
+          value:
+            candle.close,
+
+        })
+      )
+
+    );
+
+    volumeSeries.setData(
+
+      history.map(
+        candle => ({
+
+          time:
+            candle.time as Time,
+
+          value:
+            candle.volume,
+
+          color:
+            candle.close >=
+            candle.open
+
+              ? "rgba(22, 163, 74, 0.45)"
+
+              : "rgba(220, 38, 38, 0.45)",
+
+        })
+      )
+
+    );
+
+    chart
+      .timeScale()
+      .fitContent();
+
+  }
+
+  function setChartType(
+    chartType: ChartType
+  ): void {
+
+    selectedChartType =
+      chartType;
+
+    candleSeries.applyOptions({
+
+      visible:
+        selectedChartType ===
+        "candles",
+
+    });
+
+    lineSeries.applyOptions({
+
+      visible:
+        selectedChartType ===
+        "line",
+
+    });
+
+  }
+
+  function setStopPrice(
+    stopPrice: number | undefined
+  ): void {
+
+    const hasStopPrice =
+      stopPrice !== undefined &&
+      Number.isFinite(
+        stopPrice
+      ) &&
+      stopPrice > 0;
+
+    const price =
+      hasStopPrice
+        ? stopPrice
+        : 0;
+
+    candleStopPriceLine
+      .applyOptions({
+
+        price,
+
+        axisLabelVisible:
+          hasStopPrice,
+
+        lineVisible:
+          hasStopPrice,
+
+      });
+
+    lineStopPriceLine
+      .applyOptions({
+
+        price,
+
+        axisLabelVisible:
+          hasStopPrice,
+
+        lineVisible:
+          hasStopPrice,
+
+      });
+
+  }
+
+  function resize(
+    width: number,
+    height: number
+  ): void {
+
+    if (
+      width <= 0 ||
+      height <= 0
+    ) {
+      return;
     }
 
-    function setStopPrice(
-        stopPrice: number | undefined
-    ): void {
+    chart.resize(
+      width,
+      height
+    );
 
-        candleSeries.removePriceLine(
-            stopPriceLine
-        );
+  }
 
-        stopPriceLine =
-            candleSeries.createPriceLine({
+  function destroy(): void {
 
-                price:
-                    stopPrice ?? 0,
+    chart.remove();
 
-                color: "#ef4444",
+  }
 
-                lineWidth: 2,
+  return {
 
-                lineStyle:
-                    LineStyle.Solid,
+    setHistory,
 
-                axisLabelVisible:
-                    stopPrice !== undefined,
+    setChartType,
 
-            });
+    setStopPrice,
 
-    }
+    resize,
 
-    function resize(
-        width: number,
-        height: number
-    ): void {
+    destroy,
 
-        chart.resize(
-            width,
-            height
-        );
-
-    }
-
-    function destroy(): void {
-
-        chart.remove();
-
-    }
-
-    return {
-
-        setCandles,
-
-        setStopPrice,
-
-        resize,
-
-        destroy,
-
-    };
+  };
 
 }

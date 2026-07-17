@@ -81,7 +81,7 @@ export function PortfolioManager() {
             symbols: [],
             deposits: [],
             tradeNotes: [],
-            currency: "NZD",
+            currency: "USD",
             selectedSymbol: "",
             riskPercent: 2,
             stopLossPercent: 15,

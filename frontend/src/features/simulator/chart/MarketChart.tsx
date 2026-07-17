@@ -1,124 +1,351 @@
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import type { MarketData } from "../types";
+import type {
+  MarketData,
+} from "../types";
 
 import {
   createLightweightChart,
+  type ChartType,
   type LightweightChartAdapter,
 } from "./adapters/lightweightChart";
 
 type MarketChartProps = {
+
   marketData: MarketData;
-  stopPrice?: number;
+
+  stopPrice:
+    number | undefined;
+
 };
+
+const CHART_TYPE_STORAGE_KEY =
+  "trade-simulator-chart-type";
+
+function loadChartType():
+  ChartType {
+
+  try {
+
+    const storedValue =
+      localStorage.getItem(
+        CHART_TYPE_STORAGE_KEY
+      );
+
+    if (
+      storedValue ===
+      "candles" ||
+      storedValue ===
+      "line"
+    ) {
+      return storedValue;
+    }
+
+  } catch {
+
+    //
+    // localStorage may be unavailable
+    // in restricted browser contexts.
+    //
+
+  }
+
+  return "candles";
+
+}
+
+function saveChartType(
+  chartType: ChartType
+): void {
+
+  try {
+
+    localStorage.setItem(
+      CHART_TYPE_STORAGE_KEY,
+      chartType
+    );
+
+  } catch {
+
+    //
+    // The chart still works when the
+    // preference cannot be persisted.
+    //
+
+  }
+
+}
 
 export function MarketChart({
   marketData,
   stopPrice,
 }: MarketChartProps) {
 
-  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef =
+    useRef<HTMLDivElement | null>(
+      null
+    );
 
   const chartRef =
-    useRef<LightweightChartAdapter | null>(null);
+    useRef<
+      LightweightChartAdapter |
+      undefined
+    >(
+      undefined
+    );
 
-  // Create chart once
+  const [
+    chartType,
+    setChartType,
+  ] = useState<ChartType>(
+    loadChartType
+  );
+
   useEffect(() => {
 
-    if (!chartContainerRef.current) {
+    const container =
+      containerRef.current;
+
+    if (!container) {
       return;
     }
 
-    chartRef.current =
+    const chart =
       createLightweightChart(
-        chartContainerRef.current
+        container
       );
 
+    chartRef.current =
+      chart;
+
+    const resizeObserver =
+      new ResizeObserver(
+        entries => {
+
+          const entry =
+            entries[0];
+
+          if (!entry) {
+            return;
+          }
+
+          const {
+            width,
+            height,
+          } =
+            entry.contentRect;
+
+          chart.resize(
+            width,
+            height
+          );
+
+        }
+      );
+
+    resizeObserver.observe(
+      container
+    );
+
     return () => {
-      chartRef.current?.destroy();
+
+      resizeObserver.disconnect();
+
+      chart.destroy();
+
+      chartRef.current =
+        undefined;
+
     };
 
   }, []);
 
-  // Update candles whenever history changes
   useEffect(() => {
 
-    if (!chartRef.current) {
-      return;
-    }
+    chartRef
+      .current
+      ?.setHistory(
+        marketData.history
+      );
 
-    chartRef.current.setCandles(
-      marketData.history
-    );
-
-  }, [marketData.history]);
+  }, [
+    marketData.history,
+  ]);
 
   useEffect(() => {
 
-    if (!chartRef.current) {
-      return;
-    }
-    chartRef.current.setStopPrice(
-      stopPrice
+    chartRef
+      .current
+      ?.setStopPrice(
+        stopPrice
+      );
+
+  }, [
+    stopPrice,
+  ]);
+
+  useEffect(() => {
+
+    chartRef
+      .current
+      ?.setChartType(
+        chartType
+      );
+
+  }, [
+    chartType,
+  ]);
+
+  function handleChartTypeSelected(
+    selectedChartType: ChartType
+  ): void {
+
+    setChartType(
+      selectedChartType
     );
 
-  }, [stopPrice]);
+    saveChartType(
+      selectedChartType
+    );
 
-  // // Resize the chart whenever its container changes size
-  // useEffect(() => {
-
-  //   if (!chartContainerRef.current || !chartRef.current) {
-  //     return;
-  //   }
-
-  //   const container = chartContainerRef.current;
-
-  //   const resizeObserver = new ResizeObserver(() => {
-
-  //     chartRef.current?.resize(
-  //       container.clientWidth,
-  //       container.clientHeight
-  //     );
-
-  //   });
-
-  //   resizeObserver.observe(container);
-
-  //   // Initial resize
-  //   chartRef.current.resize(
-  //     container.clientWidth,
-  //     container.clientHeight
-  //   );
-
-  //   return () => {
-  //     resizeObserver.disconnect();
-  //   };
-
-  // }, []);
+  }
 
   return (
-    <section className="flex h-full min-h-0 flex-col rounded-lg border bg-white shadow-sm">
-      {/* <header className="flex items-center justify-between border-b px-4 py-3">
 
-        <h2 className="text-lg font-semibold">
-          Market Chart
-        </h2>
+    <div className="flex h-full min-h-0 flex-col">
 
-        <span className="text-sm text-gray-500">
-          {marketData.history.length} candles
-        </span>
-
-      </header> */}
-
-      <div className="flex-1 min-h-0 p-4">
+      <div className="mb-2 flex justify-end">
 
         <div
-          ref={chartContainerRef}
-          className="h-full w-full"
-        />
+          className="
+            inline-flex
+            rounded
+            border
+            border-gray-200
+            bg-gray-50
+            p-0.5
+          "
+          role="group"
+          aria-label="Chart type"
+        >
+
+          <button
+
+            type="button"
+
+            aria-pressed={
+              chartType ===
+              "candles"
+            }
+
+            onClick={() =>
+              handleChartTypeSelected(
+                "candles"
+              )
+            }
+
+            className={
+              chartType ===
+              "candles"
+
+                ? `
+                  rounded
+                  bg-white
+                  px-3
+                  py-1
+                  text-sm
+                  font-medium
+                  text-gray-900
+                  shadow-sm
+                `
+
+                : `
+                  rounded
+                  px-3
+                  py-1
+                  text-sm
+                  text-gray-500
+                  hover:bg-white
+                  hover:text-gray-900
+                `
+            }
+          >
+
+            Candles
+
+          </button>
+
+          <button
+
+            type="button"
+
+            aria-pressed={
+              chartType ===
+              "line"
+            }
+
+            onClick={() =>
+              handleChartTypeSelected(
+                "line"
+              )
+            }
+
+            className={
+              chartType ===
+              "line"
+
+                ? `
+                  rounded
+                  bg-white
+                  px-3
+                  py-1
+                  text-sm
+                  font-medium
+                  text-blue-600
+                  shadow-sm
+                `
+
+                : `
+                  rounded
+                  px-3
+                  py-1
+                  text-sm
+                  text-gray-500
+                  hover:bg-white
+                  hover:text-blue-600
+                `
+            }
+          >
+
+            Line
+
+          </button>
+
+        </div>
 
       </div>
 
-    </section>
+      <div
+
+        ref={
+          containerRef
+        }
+
+        className="
+          min-h-0
+          flex-1
+          overflow-hidden
+          rounded
+        "
+
+      />
+
+    </div>
+
   );
+
 }

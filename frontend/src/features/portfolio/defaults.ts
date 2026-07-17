@@ -3,12 +3,24 @@ export const DEFAULT_PORTFOLIOS = [
         id: "ebca93dd-4fac-45b6-a31e-68768f6c33c5",
         name: "Portfolio",
 
-        currency: "NZD",
+        currency: "USD",
         riskPercent: 2,
         stopLossPercent: 15,
         selectedSymbol: "AAPL",
 
         symbols: [
+            "JNJ",
+            "CLOV",
+            "CLNE",
+            "CERS",
+            "XYZ",
+            "AKBA",
+            "AFRM",
+            "ABEO",
+            "RUN",
+            "AMD",
+            "GE",
+            "BA",
             "RIVN",
             "SOFI",
             "JPM",
@@ -41,7 +53,7 @@ export const DEFAULT_PORTFOLIOS = [
 
                 timestampUtc: new Date().toISOString(),
 
-                amount: 40000,
+                amount: 23000,
 
                 description: "Initial capital",
 
@@ -53,7 +65,7 @@ export const DEFAULT_PORTFOLIOS = [
     //     id: "11111111-1111-1111-1111-111111111111",
     //     name: "Paper",
 
-    //     currency: "NZD",
+    //     currency: "USD",
     //     riskPercent: 1,
     //     stopLossPercent: 15,
     //     selectedSymbol: "AAPL",
