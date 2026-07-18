@@ -1,120 +1,114 @@
 interface ApiKeyUsage {
-    count: number;
-    lastUsedAt?: string;
-    unavailableUntil?: string;
+  count: number;
+  lastUsedAt?: string;
+  unavailableUntil?: string;
 }
 
 type ApiKeyUsageMap = Record<string, ApiKeyUsage>;
 
-const STORAGE_PREFIX = "marketDataApiUsage";
+type ApiUsage = Record<string, ApiKeyUsageMap>;
 
-function getStorageKey(
-    provider: string,
-): string {
-    return `${STORAGE_PREFIX}:${provider}`;
+const STORAGE_KEY = "apiUsage";
+
+function loadApiUsage(): ApiUsage {
+  const value = localStorage.getItem(STORAGE_KEY);
+
+  if (!value) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(value) as ApiUsage;
+  } catch {
+    return {};
+  }
 }
 
-function loadUsage(
-    provider: string,
-): ApiKeyUsageMap {
-    const value = localStorage.getItem(
-        getStorageKey(provider)
-    );
+function saveApiUsage(apiUsage: ApiUsage): void {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(apiUsage),
+  );
+}
 
-    if (!value) {
-        return {};
-    }
+function loadUsage(provider: string): ApiKeyUsageMap {
+  const apiUsage = loadApiUsage();
 
-    try {
-        return JSON.parse(value) as ApiKeyUsageMap;
-    } catch {
-        return {};
-    }
+  return apiUsage[provider] ?? {};
 }
 
 function saveUsage(
-    provider: string,
-    usage: ApiKeyUsageMap,
+  provider: string,
+  usage: ApiKeyUsageMap,
 ): void {
-    localStorage.setItem(
-        getStorageKey(provider),
-        JSON.stringify(usage)
-    );
+  const apiUsage = loadApiUsage();
+
+  saveApiUsage({
+    ...apiUsage,
+    [provider]: usage,
+  });
 }
 
 function isAvailable(
-    usage: ApiKeyUsage | undefined,
+  usage: ApiKeyUsage | undefined,
 ): boolean {
-    if (!usage?.unavailableUntil) {
-        return true;
-    }
+  if (!usage?.unavailableUntil) {
+    return true;
+  }
 
-    return (
-        new Date(usage.unavailableUntil).getTime() <=
-        Date.now()
-    );
+  return (
+    new Date(usage.unavailableUntil).getTime() <=
+    Date.now()
+  );
 }
 
 export function getNextApiKey(
-    provider: string,
-    keys: string[],
+  provider: string,
+  keys: string[],
 ): string | undefined {
-    const usage = loadUsage(provider);
+  const usage = loadUsage(provider);
 
-    return keys
-        .filter(key =>
-            isAvailable(usage[key])
-        )
-        .map(key => ({
-            key,
-            count: usage[key]?.count ?? 0,
-        }))
-        .sort(
-            (left, right) =>
-                left.count - right.count
-        )[0]?.key;
+  return keys
+    .filter(key => isAvailable(usage[key]))
+    .map(key => ({
+      key,
+      count: usage[key]?.count ?? 0,
+    }))
+    .sort(
+      (left, right) =>
+        left.count - right.count,
+    )[0]?.key;
 }
 
 export function recordApiKeyUse(
-    provider: string,
-    key: string,
+  provider: string,
+  key: string,
 ): void {
-    const usage = loadUsage(provider);
+  const usage = loadUsage(provider);
 
-    usage[key] = {
-        ...usage[key],
-        count:
-            (usage[key]?.count ?? 0) + 1,
-        lastUsedAt:
-            new Date().toISOString(),
-    };
+  usage[key] = {
+    ...usage[key],
+    count: (usage[key]?.count ?? 0) + 1,
+    lastUsedAt: new Date().toISOString(),
+  };
 
-    saveUsage(
-        provider,
-        usage
-    );
+  saveUsage(provider, usage);
 }
 
 export function temporarilyDisableApiKey(
-    provider: string,
-    key: string,
-    durationMilliseconds: number,
+  provider: string,
+  key: string,
+  durationMilliseconds: number,
 ): void {
-    const usage = loadUsage(provider);
+  const usage = loadUsage(provider);
 
-    usage[key] = {
-        ...usage[key],
-        count:
-            usage[key]?.count ?? 0,
-        unavailableUntil:
-            new Date(
-                Date.now() +
-                durationMilliseconds
-            ).toISOString(),
-    };
+  usage[key] = {
+    ...usage[key],
+    count: usage[key]?.count ?? 0,
+    unavailableUntil: new Date(
+      Date.now() + durationMilliseconds,
+    ).toISOString(),
+  };
 
-    saveUsage(
-        provider,
-        usage
-    );
+  saveUsage(provider, usage);
 }

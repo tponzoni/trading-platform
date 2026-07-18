@@ -4,39 +4,27 @@ import type { MarketData } from "../types";
 
 import {
   createLightweightChart,
-  type ChartType,
   type LightweightChartAdapter,
 } from "./adapters/lightweightChart";
 
 import { MARKET_CHART_EVENTS } from "./data/marketEvents";
+
+import type {
+  ChartType,
+} from "../../../shared/services/storage/userPreferences";
+
+import {
+  loadUserPreferences,
+  updateUserPreferences,
+} from "../../../shared/services/storage/userPreferencesService";
 
 type MarketChartProps = {
   marketData: MarketData;
   stopPrice: number | undefined;
 };
 
-const CHART_TYPE_STORAGE_KEY = "trade-simulator-chart-type";
-
-function loadChartType(): ChartType {
-  try {
-    const storedValue = localStorage.getItem(CHART_TYPE_STORAGE_KEY);
-
-    if (storedValue === "candles" || storedValue === "line") {
-      return storedValue;
-    }
-  } catch {
-    // localStorage may be unavailable.
-  }
-
-  return "candles";
-}
-
-function saveChartType(chartType: ChartType): void {
-  try {
-    localStorage.setItem(CHART_TYPE_STORAGE_KEY, chartType);
-  } catch {
-    // The chart still works when the preference cannot be persisted.
-  }
+function loadPreferredChartType(): ChartType {
+  return loadUserPreferences().chartType ?? "candles";
 }
 
 export function MarketChart({
@@ -50,7 +38,7 @@ export function MarketChart({
   );
 
   const [chartType, setChartType] = useState<ChartType>(
-    loadChartType,
+    loadPreferredChartType,
   );
 
   const selectedSymbol =
@@ -127,7 +115,10 @@ export function MarketChart({
     selectedChartType: ChartType,
   ): void {
     setChartType(selectedChartType);
-    saveChartType(selectedChartType);
+
+    updateUserPreferences({
+      chartType: selectedChartType,
+    });
   }
 
   const activeButtonClassName = `

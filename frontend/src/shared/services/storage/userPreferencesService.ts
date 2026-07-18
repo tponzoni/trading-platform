@@ -1,16 +1,6 @@
-import type { UserPreferences } from "./userPreferences";
+import { EMPTY_USER_PREFERENCES, type UserPreferences } from "./userPreferences";
 
 const STORAGE_KEY = "userPreferences";
-
-const EMPTY_USER_PREFERENCES: UserPreferences = {
-  timeframe: "1Y",
-  layout: {
-    panelLayout: {
-      simulator: 66,
-      portfolio: 34
-    }
-  },
-};
 
 export function loadUserPreferences(): UserPreferences {
   const value = localStorage.getItem(

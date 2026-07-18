@@ -93,7 +93,7 @@ export async function fetchEodhdHistory(
             `&to=${encodeURIComponent(toDate)}` +
             "&fmt=json" +
             "&order=a";
-console.log('here');
+
         try {
             const response =
                 await safeFetchJson<

@@ -16,8 +16,7 @@ import {
   createChartEventOverlay,
   type ChartEventOverlay,
 } from "./chartEventOverlay";
-
-export type ChartType = "candles" | "line";
+import type { ChartType } from "../../../../shared/services/storage/userPreferences";
 
 export interface LightweightChartAdapter {
   setHistory(history: HistoricalPrice[]): void;
@@ -37,7 +36,7 @@ export function createLightweightChart(
   container: HTMLDivElement,
 ): LightweightChartAdapter {
   const chart: IChartApi = createChart(container, {
-    autoSize: true,
+    // autoSize: true,
 
     layout: {
       background: {

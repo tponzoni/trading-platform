@@ -9,6 +9,11 @@ export const DEFAULT_PORTFOLIOS = [
         selectedSymbol: "AAPL",
 
         symbols: [
+            "LMT",
+            "WMT",
+            "GAP",
+            "DIS",
+            "MRVL",
             "JNJ",
             "CLOV",
             "CLNE",
